@@ -3,6 +3,10 @@
  * PRODUCED BY: CAMERON PHAN, SON PHAM
  */
 
+/**
+ * This is a comment
+ */
+
 function setup() {
 
 }

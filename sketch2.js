@@ -17,6 +17,8 @@ var mousePressedOverNewGame;
 var mousePressedOverMultiverse;
 var mousePressedOverOption;
 
+var fontPressStart;
+
 function mainmenu(pressedKey){
     rectMode(RADIUS);
     fill(255);
@@ -27,7 +29,7 @@ function mainmenu(pressedKey){
     switch(pressedKey) {
         case 1:
         {
-            fill(150);
+            fill(120);
             newgame_border = rect(640, 300, 165, 35);
             fill(255);
             multiverse_border = rect(640, 420, 165, 35);
@@ -38,7 +40,7 @@ function mainmenu(pressedKey){
         {
             fill(255);
             newgame_border = rect(640, 300, 165, 35);
-            fill(150);
+            fill(120);
             multiverse_border = rect(640, 420, 165, 35);
             fill(255)
             option_border = rect(640, 540, 165, 35);
@@ -49,7 +51,7 @@ function mainmenu(pressedKey){
             fill(255);
             newgame_border = rect(640, 300, 165, 35);
             multiverse_border = rect(640, 420, 165, 35);
-            fill(150);
+            fill(120);
             option_border = rect(640, 540, 165, 35);
             break;
         }
@@ -68,7 +70,9 @@ function mainmenu(pressedKey){
     var option = rect(640, 540, 160, 30);
 
     textAlign(CENTER, CENTER);
-    fill(255).strokeWeight(0).textSize(30);
+
+    fill(255).strokeWeight(0).textSize(28);
+    textFont(fontPressStart);
     text("New Game", 640, 300);
     text("Multiverse", 640, 420);
     text("Option", 640, 540);
@@ -102,6 +106,10 @@ function mouseReleased(){
         alert("Option!");
     }
     mousePressedOverOption = false;
+}
+
+function preload(){
+    fontPressStart = loadFont("assets/PressStart2P.ttf");
 }
 
 function setup() {

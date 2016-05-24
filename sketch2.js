@@ -17,14 +17,14 @@ var mousePressedOverNewGame;
 var mousePressedOverMultiverse;
 var mousePressedOverOption;
 
-function mainmenu(pressedKey){
+function mainmenu(pressedButton){
     rectMode(RADIUS);
     fill(255);
     var newgame_border;
     var multiverse_border;
     var option_border;
 
-    switch(pressedKey) {
+    switch(pressedButton) {
         case 1:
         {
             fill(150);
@@ -89,17 +89,17 @@ function mousePressed(){
 
 function mouseReleased(){
     if (mousePressedOverNewGame && mouseIsOverNewGame){
-        alert("New Game!");
+        console.log("New Game!");
     }
     mousePressedOverNewGame = false;
 
     if (mousePressedOverMultiverse && mouseIsOverMultiverse) {
-        alert("Multiverse!");
+        console.log("Multiverse!");
     }
     mousePressedOverMultiverse = false;
 
     if (mousePressedOverOption && mouseIsOverOption) {
-        alert("Option!");
+        console.log("Option!");
     }
     mousePressedOverOption = false;
 }

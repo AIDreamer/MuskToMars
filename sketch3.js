@@ -5,7 +5,15 @@
  * PRODUCED BY: CAMERON PHAN, SON PHAM
  */
 
-function UI{
+var items[
+    {name: "Explosives", list: ["Nuclear fission bomb", "Boosted fission bomb", "Hydrogen bomb",], mouseIsOver:false},
+    {name: "Orbital Mirror", list: ["Construct: Space Station - Mirror Manufacturing"], mouseIsOver:false},
+    {name: "Meteor", list: ["Construct: Space Station - Meteor Analysis"], mouseIsOver:false},
+    {name: "Pyrolysis", list: ["Pyrolyze: Mars' earth"], mouseIsOver:false},
+    {name: "Life", list: ["Moss"], mouseIsOver:false}
+];
+
+function itemMenuUI{
     
 }
 

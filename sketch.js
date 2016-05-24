@@ -117,7 +117,7 @@ function generateIcosahedron()
 
     // Push faces to edge
     for (i = 0; i < faces.length; ++i)
-        for (j = 0; j < faces[i].e.length; ++j)
+        for (i = 0; j < faces[i].e.length; ++j)
             edges[j].f.push(i);
 
     return { nodes: nodes, edges: edges, faces: faces };

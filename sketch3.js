@@ -25,7 +25,7 @@ function menuUI(){
 
     rectMode(CORNERS);
     fill(255);
-    rect(0, 565, 975, 720); //Item box
+    rect(0, 565, 975, 720); //Item box border
     rect(975, 515, 1280, 720); //Status box border
     fill(0);
     rect(0, 570, 975, 720); //Item box
@@ -65,10 +65,9 @@ function menuUI(){
  */
 function category(){
     if (tabSelected > -1){
-        for (var i=0; i<items[tabSelected].list[i]; i++){
-            fill(255); rect(15*(i+1) + 120*i - 5, 520, 15*(i+1) + 120*(i+1) + 5, 565);
-            fill(0); rect(15*(i+1) + 120*i, 525, 15*(i+1) + 120*(i+1), 565);
-
+        for (var i=0; i<items[tabSelected].list.length; i++){
+            fill(150); rect(10 + 30*i + 140*i, 585, 20 + 30*i + 140*(i+1), 705);
+            fill(0); rect(15 + 30*i + 140*i, 590, 15 + 30*i + 140*(i+1), 700);
         }
     }
 }
@@ -95,4 +94,5 @@ function setup() {
 function draw(){
     background(40);
     menuUI();
+    category();
 }

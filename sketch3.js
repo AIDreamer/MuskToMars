@@ -147,7 +147,9 @@ function mousePressed(){
 function mouseReleased() {
     for (var i=0; i<items.length; i++) {
         if (items[i].mousePressedOver && items[i].mouseIsOver){
-            tabSelected = i;
+            if (tabSelected !== i) {tabSelected = i;}
+            else {tabSelected = -1;}
+
         }
     }
     if (tabSelected>-1){

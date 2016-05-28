@@ -5,8 +5,18 @@
  * PRODUCED BY: CAMERON PHAN, SON PHAM
  */
 
+var Weapon = function(weapName, img, price) {
+    this.weapName = weapName;
+    this.img = img;
+    this.price = price;
+}
+
+var explosive1 = new Weapon("Nuclear Fission Bomb", "Hiroshima.png", 500000000000);
+var explosive2 = new Weapon("Boosted Fission Bomb", "Hiroshima.png", 500000000000);
+var explosive3 = new Weapon("Hydrogen bomb", "Hiroshima", 500000000000);
+
 var items = [
-    {name: "Explosives", list: ["Nuclear fission bomb", "Boosted fission bomb", "Hydrogen bomb"], mouseIsOver:false, mousePressedOver:false, mouseIsOverList:[], mousePressedOverList:[]},
+    {name: "Explosives", list: [explosive1, explosive2, explosive3], mouseIsOver:false, mousePressedOver:false, mouseIsOverList:[], mousePressedOverList:[]},
     {name: "Orbital Mirror", list: ["Construct: Space Station - Mirror Manufacturing"], mouseIsOver:false, mousePressedOver:false, mouseIsOverList:[], mousePressedOverList:[]},
     {name: "Meteor", list: ["Construct: Space Station - Meteor Analysis"], mouseIsOver:false, mousePressedOver:false, mouseIsOverList:[], mousePressedOverList:[]},
     {name: "Pyrolysis", list: ["Pyrolyze: Mars' earth"], mouseIsOver:false, mousePressedOver:false, mouseIsOverList:[], mousePressedOverList:[]},

@@ -5,22 +5,30 @@
  * PRODUCED BY: CAMERON PHAN, SON PHAM
  */
 
-var Weapon = function(weapName, img, price) {
-    this.weapName = weapName;
+var Item = function(itemName, img, price, dPrice) {
+    this.itemName = itemName;
     this.img = img;
     this.price = price;
+    this.dPrice = dPrice;
 }
 
-var explosive1 = new Weapon("Nuclear Fission Bomb", "Hiroshima.png", 500000000000);
-var explosive2 = new Weapon("Boosted Fission Bomb", "Hiroshima.png", 500000000000);
-var explosive3 = new Weapon("Hydrogen bomb", "Hiroshima", 500000000000);
+var explosive1 = new Item("Nuclear Fission Bomb", "Image var", 210000000, 0);
+var explosive2 = new Item("Boosted Fission Bomb", "Image var", 260000000, 0);
+var explosive3 = new Item("Hydrogen Bomb", "Image var", 400000000, 0);
+var mirror1 = new Item("Construct: Space Station - Mirror Manufacturing", "Image var", 100000000000, 0); //100B
+var mirror2 = new Item("Orbital Mirror", "Image var", 0, 80000000000); //80B
+var meteor1 = new Item("Construct: Space Station - Meteor Analysis", "Image var", 100000000000, 0); //100B
+var meteor2 = new Item("Send Meteor back to Mars", "Image var", 0, 500000000); //500M
+var pyrolysis = new Item("Pyrolyze: Mars' earth", "Image var", 0, 500000000); //500M
+var life1 = new Item("Moss", "Image Var", 0, 0);
+var life2 = new Item("Advanced plants", "Image var", 0, 0);
 
 var items = [
     {name: "Explosives", list: [explosive1, explosive2, explosive3], mouseIsOver:false, mousePressedOver:false, mouseIsOverList:[], mousePressedOverList:[]},
-    {name: "Orbital Mirror", list: ["Construct: Space Station - Mirror Manufacturing"], mouseIsOver:false, mousePressedOver:false, mouseIsOverList:[], mousePressedOverList:[]},
-    {name: "Meteor", list: ["Construct: Space Station - Meteor Analysis"], mouseIsOver:false, mousePressedOver:false, mouseIsOverList:[], mousePressedOverList:[]},
-    {name: "Pyrolysis", list: ["Pyrolyze: Mars' earth"], mouseIsOver:false, mousePressedOver:false, mouseIsOverList:[], mousePressedOverList:[]},
-    {name: "Life", list: ["Moss"], mouseIsOver:false, mousePressedOver:false, mouseIsOverList:[], mousePressedOverList:[]}
+    {name: "Orbital Mirror", list: [mirror1], mouseIsOver:false, mousePressedOver:false, mouseIsOverList:[], mousePressedOverList:[]},
+    {name: "Meteor", list: [meteor1], mouseIsOver:false, mousePressedOver:false, mouseIsOverList:[], mousePressedOverList:[]},
+    {name: "Pyrolysis", list: [pyrolysis], mouseIsOver:false, mousePressedOver:false, mouseIsOverList:[], mousePressedOverList:[]},
+    {name: "Life", list: [life1, life2], mouseIsOver:false, mousePressedOver:false, mouseIsOverList:[], mousePressedOverList:[]}
 ];
 // Item bar => tab.name => list[i]
 
@@ -60,7 +68,7 @@ function menuUI(){
     textAlign(LEFT, TOP);
     fill(255).strokeWeight(0).textSize(24);
     text("Year: " + marsStatusBox.year + "\nTotal Cost: " + marsStatusBox.budget +
-        "\nCost/year: " + marsStatusBox.costperyear + "\nPopulation: " + marsStatusBox.population, 1000, 540);
+        "\nCost per year: " + marsStatusBox.costperyear + "\nPopulation: " + marsStatusBox.population, 1000, 540);
 
 } //menuUI()
 
@@ -78,7 +86,7 @@ function category(){
             rectMode(CENTER);
             textAlign(CENTER, CENTER);
             fill(255).strokeWeight(0).textSize(14);
-            text(items[tabSelected].list[i], 115 + 25*i + 140*i, 645, 120, 100);
+            text(items[tabSelected].list[i].itemName, 115 + 25*i + 140*i, 645, 120, 100);
         }
     }
 }
@@ -96,7 +104,8 @@ function infoBox() {
 
                 textAlign(LEFT, BOTTOM);
                 fill(255).strokeWeight(0).textSize(12);
-                text("Description: \nEffect: \nCost: ", mouseX + 20, mouseY - 75);
+                text("Description: " + "\nEffect: " + "\nCost: " + items[tabSelected].list[i].price + "\nCost per year: " +
+                    items[tabSelected].list[i].dPrice, mouseX + 20, mouseY - 75);
             }
         }
     }

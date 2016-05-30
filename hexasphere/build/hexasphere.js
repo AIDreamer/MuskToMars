@@ -1,6 +1,9 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 window.Hexasphere = require('./src/hexasphere');
 
+/**
+ *  Face
+ */
 },{"./src/hexasphere":3}],2:[function(require,module,exports){
 var Point = require('./point');
 
@@ -33,7 +36,7 @@ Face.prototype.getOtherPoints = function(point1){
         }
     }
     return other;
-}
+};
 
 Face.prototype.findThirdPoint = function(point1, point2){
     for(var i = 0; i < this.points.length; i++){
@@ -41,7 +44,7 @@ Face.prototype.findThirdPoint = function(point1, point2){
             return this.points[i];
         }
     }
-}
+};
 
 Face.prototype.isAdjacentTo = function(face2){
     // adjacent if 2 of the points are the same
@@ -57,7 +60,7 @@ Face.prototype.isAdjacentTo = function(face2){
     }
 
     return (count == 2);
-}
+};
 
 Face.prototype.getCentroid = function(clear){
     if(this.centroid && !clear){
@@ -72,11 +75,14 @@ Face.prototype.getCentroid = function(clear){
     this.centroid = centroid;
 
     return centroid;
-
-}
+};
 
 module.exports = Face;
 
+
+/**
+ *  Hexasphere
+ */
 },{"./point":4}],3:[function(require,module,exports){
 var Tile = require('./tile'),
     Face = require('./face'),
@@ -185,6 +191,11 @@ var Hexasphere = function(radius, numDivisions, hexSize){
 
 module.exports = Hexasphere;
 
+
+
+/**
+ *  Point
+ */
 },{"./face":2,"./point":4,"./tile":5}],4:[function(require,module,exports){
 var Point = function(x,y,z){
     if(x !== undefined && y !== undefined && z !== undefined){
@@ -195,7 +206,7 @@ var Point = function(x,y,z){
     }
 
     this.faces = [];
-}
+};
 
 Point.prototype.subdivide = function(point, count, checkPoint){
 
@@ -214,7 +225,7 @@ Point.prototype.subdivide = function(point, count, checkPoint){
 
     return segments;
 
-}
+};
 
 Point.prototype.segment = function(point, percent){
     var newPoint = new Point();
@@ -229,7 +240,7 @@ Point.prototype.segment = function(point, percent){
 
 Point.prototype.midpoint = function(point, location){
     return this.segment(point, .5);
-}
+};
 
 
 Point.prototype.project = function(radius, percent){
@@ -254,7 +265,7 @@ Point.prototype.project = function(radius, percent){
 
 Point.prototype.registerFace = function(face){
     this.faces.push(face);
-}
+};
 
 Point.prototype.getOrderedFaces = function(){
     var workingArray = this.faces.slice();
@@ -281,7 +292,7 @@ Point.prototype.getOrderedFaces = function(){
     }
 
     return ret;
-}
+};
 
 Point.prototype.findCommonFace = function(other, notThisFace){
     for(var i = 0; i< this.faces.length; i++){
@@ -293,17 +304,22 @@ Point.prototype.findCommonFace = function(other, notThisFace){
     }
 
     return null;
-}
+};
 
 
 
 Point.prototype.toString = function(){
     return "" + Math.round(this.x*100)/100 + "," + Math.round(this.y*100)/100 + "," + Math.round(this.z*100)/100;
 
-}
+};
 
 module.exports = Point;
 
+
+
+/**
+ *  Tile
+ */
 },{}],5:[function(require,module,exports){
 var Point = require('./point');
 
@@ -342,8 +358,6 @@ Tile.prototype.getLatLon = function(radius, boundaryNum){
         lon: 180 * theta / Math.PI
     };
 };
-
-
 
 Tile.prototype.scaledBoundary = function(scale){
 

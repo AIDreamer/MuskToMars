@@ -12,25 +12,26 @@ var Item = function(itemName, img, price, dPrice) {
     this.dPrice = dPrice;
 }
 
-var explosive1 = new Item("Nuclear Fission Bomb", "Image var", 210000000, 0);
-var explosive2 = new Item("Boosted Fission Bomb", "Image var", 260000000, 0);
-var explosive3 = new Item("Hydrogen Bomb", "Image var", 400000000, 0);
-var mirror1 = new Item("Construct: Space Station - Mirror Manufacturing", "Image var", 100000000000, 0); //100B
-var mirror2 = new Item("Orbital Mirror", "Image var", 0, 80000000000); //80B
-var meteor1 = new Item("Construct: Space Station - Meteor Analysis", "Image var", 100000000000, 0); //100B
-var meteor2 = new Item("Send Meteor back to Mars", "Image var", 0, 500000000); //500M
+var explosive0 = new Item("Nuclear Fission Bomb", "Image var", 210000000, 0);
+var explosive1 = new Item("Boosted Fission Bomb", "Image var", 260000000, 0);
+var explosive2 = new Item("Hydrogen Bomb", "Image var", 400000000, 0);
+var mirror0 = new Item("Construct: Space Station - Mirror Manufacturing", "Image var", 100000000000, 0); //100B
+var mirror1 = new Item("Orbital Mirror", "Image var", 0, 80000000000); //80B
+var meteor0 = new Item("Construct: Space Station - Meteor Analysis", "Image var", 100000000000, 0); //100B
+var meteor1 = new Item("Send Meteor back to Mars", "Image var", 0, 500000000); //500M
 var pyrolysis = new Item("Pyrolyze: Mars' earth", "Image var", 0, 500000000); //500M
-var life1 = new Item("Moss", "Image Var", 0, 0);
-var life2 = new Item("Advanced plants", "Image var", 0, 0);
+var life0 = new Item("Moss", "Image Var", 0, 0);
+var life1 = new Item("Advanced plants", "Image var", 0, 0);
 
 var items = [
-    {name: "Explosives", list: [explosive1, explosive2, explosive3], mouseIsOver:false, mousePressedOver:false, mouseIsOverList:[], mousePressedOverList:[]},
-    {name: "Orbital Mirror", list: [mirror1], mouseIsOver:false, mousePressedOver:false, mouseIsOverList:[], mousePressedOverList:[]},
-    {name: "Meteor", list: [meteor1], mouseIsOver:false, mousePressedOver:false, mouseIsOverList:[], mousePressedOverList:[]},
+    {name: "Explosives", list: [explosive0, explosive1, explosive2], mouseIsOver:false, mousePressedOver:false, mouseIsOverList:[], mousePressedOverList:[]},
+    {name: "Orbital Mirror", list: [mirror0], mouseIsOver:false, mousePressedOver:false, mouseIsOverList:[], mousePressedOverList:[]},
+    {name: "Meteor", list: [meteor0], mouseIsOver:false, mousePressedOver:false, mouseIsOverList:[], mousePressedOverList:[]},
     {name: "Pyrolysis", list: [pyrolysis], mouseIsOver:false, mousePressedOver:false, mouseIsOverList:[], mousePressedOverList:[]},
-    {name: "Life", list: [life1, life2], mouseIsOver:false, mousePressedOver:false, mouseIsOverList:[], mousePressedOverList:[]}
+    {name: "Life", list: [life0, life1], mouseIsOver:false, mousePressedOver:false, mouseIsOverList:[], mousePressedOverList:[]}
 ];
 // Item bar => tab.name => list[i]
+// Do not change the order/add item in the middle of items array
 
 var marsStatusBox = {year: 2016, budget: 0, costperyear: 0, population: 0};
 

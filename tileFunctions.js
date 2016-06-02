@@ -23,7 +23,7 @@ var mirror1 = new Item("Fund Construction of Orbital Mirror", "Image var", 0, 80
 var meteor0 = new Item("Construct: Space Station - Meteor Analysis", "Image var", 100000000000, 0); //100B
 var meteor1 = new Item("Analyze Meteor", "Image var", 0, 500000000); //500M
 var meteor2 = new Item("Deliver Ammonia Meteor to Mars", 800000000, 0); //800M
-var pyrolysis = new Item("Pyrolyze: Mars' earth", "Image var", 0, 500000000); //500M
+var pyrolysis0 = new Item("Pyrolyze: Mars' earth", "Image var", 0, 500000000); //500M
 var life0 = new Item("Moss", "Image Var", 0, 0);
 var life1 = new Item("Advanced plants", "Image var", 0, 0);
 
@@ -31,7 +31,7 @@ var items = [
     {name: "Explosives", list: [explosive0, explosive1, explosive2], mouseIsOver:false, mousePressedOver:false, mouseIsOverList:[], mousePressedOverList:[]},
     {name: "Orbital Mirror", list: [mirror0], mouseIsOver:false, mousePressedOver:false, mouseIsOverList:[], mousePressedOverList:[]},
     {name: "Meteor", list: [meteor0], mouseIsOver:false, mousePressedOver:false, mouseIsOverList:[], mousePressedOverList:[]},
-    {name: "Pyrolysis", list: [pyrolysis], mouseIsOver:false, mousePressedOver:false, mouseIsOverList:[], mousePressedOverList:[]},
+    {name: "Pyrolysis", list: [pyrolysis0], mouseIsOver:false, mousePressedOver:false, mouseIsOverList:[], mousePressedOverList:[]},
     {name: "Life", list: [life0, life1], mouseIsOver:false, mousePressedOver:false, mouseIsOverList:[], mousePressedOverList:[]}
 ];
 

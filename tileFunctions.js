@@ -53,6 +53,8 @@ var meteorStationCompleted = false;
 var analyzingMeteor = false;
 var meteorAnalysisProgress = 0;
 
+var turn = 0;
+
 var Tiles = [];
 var tile0 = {water: false, altitude:100, earthDensity:0, temperature:meanTemp, atmP:0, oxygenP:0, fallout:0, neighbors:[]};
 var tile1 = {water: false, altitude:100, earthDensity:0, temperature:meanTemp, atmP:0, oxygenP:0, fallout:0, neighbors:[]};
@@ -104,7 +106,7 @@ function perpetualChange(){
         }
     }
 
-
+    //Nuclear fallout
     for (var i=0; i<Tiles.length; i++){
         if (Tiles[i].fallout>0) {Tiles[i].fallout--;}
 

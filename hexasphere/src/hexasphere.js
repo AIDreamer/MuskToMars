@@ -2,28 +2,37 @@ var Tile = require('./tile'),
     Face = require('./face'),
     Point = require('./point');
 
-var Hexasphere = function(radius, numDivisions, hexSize){
+/**
+ * Create a hexasphere of radius from a number of divisions and a hex size
+ * hexSize = 1: The tile cover all the area.
+ * @param radius
+ * @param numDivisions
+ * @param hexSize
+ * @constructor
+ */
+var Hexasphere = function(radius, numDivisions, hexSize) {
 
+    // Geometric quality for the hexasphere
     this.radius = radius;
     var tao = 1.61803399;
     var corners = [
         new Point(1000, tao * 1000, 0),
         new Point(-1000, tao * 1000, 0),
-        new Point(1000,-tao * 1000,0),
-        new Point(-1000,-tao * 1000,0),
-        new Point(0,1000,tao * 1000),
-        new Point(0,-1000,tao * 1000),
-        new Point(0,1000,-tao * 1000),
-        new Point(0,-1000,-tao * 1000),
-        new Point(tao * 1000,0,1000),
-        new Point(-tao * 1000,0,1000),
-        new Point(tao * 1000,0,-1000),
-        new Point(-tao * 1000,0,-1000)
+        new Point(1000, -tao * 1000, 0),
+        new Point(-1000, -tao * 1000, 0),
+        new Point(0, 1000, tao * 1000),
+        new Point(0, -1000, tao * 1000),
+        new Point(0, 1000, -tao * 1000),
+        new Point(0, -1000, -tao * 1000),
+        new Point(tao * 1000, 0, 1000),
+        new Point(-tao * 1000, 0, 1000),
+        new Point(tao * 1000, 0, -1000),
+        new Point(-tao * 1000, 0, -1000)
     ];
 
     var points = {};
 
-    for(var i = 0; i< corners.length; i++){
+    for (var i = 0; i < corners.length; i++) {
         points[corners[i]] = corners[i];
     }
 
@@ -50,8 +59,8 @@ var Hexasphere = function(radius, numDivisions, hexSize){
         new Face(corners[9], corners[1], corners[11], false)
     ];
 
-    var getPointIfExists = function(point){
-        if(points[point]){
+    var getPointIfExists = function (point) {
+        if (points[point]) {
             // console.log("EXISTING!");
             return points[point];
         } else {
@@ -61,24 +70,23 @@ var Hexasphere = function(radius, numDivisions, hexSize){
         }
     };
 
-
     var newFaces = [];
 
-    for(var f = 0; f< faces.length; f++){
+    for (var f = 0; f < faces.length; f++) {
         // console.log("-0---");
         var prev = null;
         var bottom = [faces[f].points[0]];
         var left = faces[f].points[0].subdivide(faces[f].points[1], numDivisions, getPointIfExists);
         var right = faces[f].points[0].subdivide(faces[f].points[2], numDivisions, getPointIfExists);
-        for(var i = 1; i<= numDivisions; i++){
+        for (var i = 1; i <= numDivisions; i++) {
             prev = bottom;
             bottom = left[i].subdivide(right[i], i, getPointIfExists);
-            for(var j = 0; j< i; j++){
-                var nf = new Face(prev[j], bottom[j], bottom[j+1]); 
+            for (var j = 0; j < i; j++) {
+                var nf = new Face(prev[j], bottom[j], bottom[j + 1]);
                 newFaces.push(nf);
 
-                if(j > 0){
-                    nf = new Face(prev[j-1], prev[j], bottom[j]);
+                if (j > 0) {
+                    nf = new Face(prev[j - 1], prev[j], bottom[j]);
                     newFaces.push(nf);
                 }
             }
@@ -88,7 +96,7 @@ var Hexasphere = function(radius, numDivisions, hexSize){
     faces = newFaces;
 
     var newPoints = {};
-    for(var p in points){
+    for (var p in points) {
         var np = points[p].project(radius);
         newPoints[np] = np;
     }
@@ -96,11 +104,8 @@ var Hexasphere = function(radius, numDivisions, hexSize){
     points = newPoints;
 
     this.tiles = [];
-
-    for(var p in points){
+    for (var p in points) {
         this.tiles.push(new Tile(points[p], hexSize));
     }
-
-};
-
+}
 module.exports = Hexasphere;

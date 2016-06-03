@@ -11,12 +11,7 @@ var Tile = function(centerPoint, hexSize){
     this.centerPoint = centerPoint;
     this.faces = centerPoint.getOrderedFaces();
     this.boundary = [];
-
     this.triangles = [];
-
-    this.atmosphere = 0;
-    this.humidity = 0;
-
 
     for(var f=0; f< this.faces.length; f++){
         this.boundary.push(this.faces[f].getCentroid().segment(this.centerPoint, hexSize));

@@ -1,10 +1,17 @@
+////////////////////////////////////////////
+// Some weird and hard to understand stuff
+////////////////////////////////////////////
+
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 window.Hexasphere = require('./src/hexasphere');
-
 },{"./src/hexasphere":3}],2:[function(require,module,exports){
 var Point = require('./point');
 
 var _faceCount = 0;
+
+/////////
+// Face
+/////////
 
 var Face = function(point1, point2, point3, register){
     this.id = _faceCount++;
@@ -45,13 +52,13 @@ Face.prototype.findThirdPoint = function(point1, point2){
 
 Face.prototype.isAdjacentTo = function(face2){
     // adjacent if 2 of the points are the same
-    
+
     var count = 0;
     for(var i = 0; i< this.points.length; i++){
         for(var j =0 ; j< face2.points.length; j++){
             if(this.points[i].toString() == face2.points[j].toString()){
                 count++;
-                
+
             }
         }
     }
@@ -81,6 +88,10 @@ module.exports = Face;
 var Tile = require('./tile'),
     Face = require('./face'),
     Point = require('./point');
+
+/////////////
+// Hexasphere
+/////////////
 
 var Hexasphere = function(radius, numDivisions, hexSize){
 
@@ -154,7 +165,7 @@ var Hexasphere = function(radius, numDivisions, hexSize){
             prev = bottom;
             bottom = left[i].subdivide(right[i], i, getPointIfExists);
             for(var j = 0; j< i; j++){
-                var nf = new Face(prev[j], bottom[j], bottom[j+1]); 
+                var nf = new Face(prev[j], bottom[j], bottom[j+1]);
                 newFaces.push(nf);
 
                 if(j > 0){
@@ -165,7 +176,7 @@ var Hexasphere = function(radius, numDivisions, hexSize){
         }
     }
 
-    faces = newFaces;
+    this.faces = newFaces;
 
     var newPoints = {};
     for(var p in points){
@@ -181,9 +192,45 @@ var Hexasphere = function(radius, numDivisions, hexSize){
         this.tiles.push(new Tile(points[p], hexSize));
     }
 
+    // Cleanup the ID of all faces
+    this.faces.forEach(function(f) {
+        f.id -= 20; // First 20 faces no longer valuable
+    });
+
+    // Calculate neighbor matrix
+    var faceMatrix = new Array(this.faces.length).fill(0);
+    for (var i = 0; i < this.tiles.length; i++) {
+        this.tiles[i].faces.forEach(function(f){
+            if (faceMatrix[f.id] == 0) {
+                faceMatrix[f.id] = [];
+            }
+            faceMatrix[f.id].push(i);
+        });
+    }
+
+    // Figure out adjacent tiles using the created matrix
+    for (var i = 0; i < faceMatrix.length; i++) {
+        var f = faceMatrix[i];
+        if (f.length == 2) {
+            this.tiles[f[0]].neighbors.add(f[1]);
+            this.tiles[f[1]].neighbors.add(f[0]);
+        } else {
+            this.tiles[f[0]].neighbors.add(f[1]);
+            this.tiles[f[0]].neighbors.add(f[2]);
+            this.tiles[f[1]].neighbors.add(f[0]);
+            this.tiles[f[1]].neighbors.add(f[2]);
+            this.tiles[f[2]].neighbors.add(f[0]);
+            this.tiles[f[2]].neighbors.add(f[1]);
+        }
+    }
+
 };
 
 module.exports = Hexasphere;
+
+/////////////
+// Point
+/////////////
 
 },{"./face":2,"./point":4,"./tile":5}],4:[function(require,module,exports){
 var Point = function(x,y,z){
@@ -193,9 +240,8 @@ var Point = function(x,y,z){
         this.z = z;
 
     }
-
     this.faces = [];
-}
+};
 
 Point.prototype.subdivide = function(point, count, checkPoint){
 
@@ -214,7 +260,7 @@ Point.prototype.subdivide = function(point, count, checkPoint){
 
     return segments;
 
-}
+};
 
 Point.prototype.segment = function(point, percent){
     var newPoint = new Point();
@@ -229,8 +275,7 @@ Point.prototype.segment = function(point, percent){
 
 Point.prototype.midpoint = function(point, location){
     return this.segment(point, .5);
-}
-
+};
 
 Point.prototype.project = function(radius, percent){
     if(percent == undefined){
@@ -254,7 +299,7 @@ Point.prototype.project = function(radius, percent){
 
 Point.prototype.registerFace = function(face){
     this.faces.push(face);
-}
+};
 
 Point.prototype.getOrderedFaces = function(){
     var workingArray = this.faces.slice();
@@ -293,22 +338,24 @@ Point.prototype.findCommonFace = function(other, notThisFace){
     }
 
     return null;
-}
-
-
+};
 
 Point.prototype.toString = function(){
     return "" + Math.round(this.x*100)/100 + "," + Math.round(this.y*100)/100 + "," + Math.round(this.z*100)/100;
 
-}
+};
 
 module.exports = Point;
 
 },{}],5:[function(require,module,exports){
 var Point = require('./point');
 
+/////////////
+// Tile
+/////////////
+
 var Tile = function(centerPoint, hexSize){
-    
+
     if(hexSize == undefined){
         hexSize = 1;
     }
@@ -318,6 +365,7 @@ var Tile = function(centerPoint, hexSize){
     this.centerPoint = centerPoint;
     this.faces = centerPoint.getOrderedFaces();
     this.boundary = [];
+    this.neighbors = new Set();
 
     this.triangles = [];
 
@@ -333,10 +381,10 @@ Tile.prototype.getLatLon = function(radius, boundaryNum){
     if(typeof boundaryNum == "number" && boundaryNum < this.boundary.length){
         point = this.boundary[boundaryNum];
     }
-    var phi = Math.acos(point.y / radius); //lat 
+    var phi = Math.acos(point.y / radius); //lat
     var theta = (Math.atan2(point.x, point.z) + Math.PI + Math.PI / 2) % (Math.PI * 2) - Math.PI; // lon
-    
-    // theta is a hack, since I want to rotate by Math.PI/2 to start.  sorryyyyyyyyyyy
+
+    // theta is a hack, since I want to rotate by Math.PI/2 to start. sorryyyyyyyyyyy
     return {
         lat: 180 * phi / Math.PI - 90,
         lon: 180 * theta / Math.PI

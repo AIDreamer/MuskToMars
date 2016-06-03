@@ -28,7 +28,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 	this.noPan = true;
 
 	this.staticMoving = false;
-	this.dynamicDampingFactor = 0.5;
+	this.dynamicDampingFactor = 0.2;
 
 	this.minDistance = 0;
 	this.maxDistance = 400;

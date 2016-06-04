@@ -34,8 +34,6 @@ Tile.prototype.getLatLon = function(radius, boundaryNum){
     };
 };
 
-
-
 Tile.prototype.scaledBoundary = function(scale){
 
     scale = Math.max(0, Math.min(1, scale));

@@ -364,6 +364,7 @@ var Tile = function(centerPoint, hexSize){
 
     this.centerPoint = centerPoint;
     this.faces = centerPoint.getOrderedFaces();
+    this.height = 0;
     this.boundary = [];
     this.neighbors = new Set();
 

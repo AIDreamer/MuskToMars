@@ -11,12 +11,7 @@ var Tile = function(centerPoint, hexSize){
     this.centerPoint = centerPoint;
     this.faces = centerPoint.getOrderedFaces();
     this.boundary = [];
-
     this.triangles = [];
-
-    this.atmosphere = 0;
-    this.humidity = 0;
-
 
     for(var f=0; f< this.faces.length; f++){
         this.boundary.push(this.faces[f].getCentroid().segment(this.centerPoint, hexSize));
@@ -38,8 +33,6 @@ Tile.prototype.getLatLon = function(radius, boundaryNum){
         lon: 180 * theta / Math.PI
     };
 };
-
-
 
 Tile.prototype.scaledBoundary = function(scale){
 

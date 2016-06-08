@@ -11,20 +11,23 @@ var heightMap,heightContext, heightCanvas;
 var pixelData, heightData;
 
 // Hexasphere variable
-var hexasphere, selectionTile;
+var hexasphere;
 var meshSphere = []; // Store all the mesh in the hexasphere
 
 // Events
 var tileChange;
 
 // Temporary storage variables
+var selectedID;
+var selectedMesh;
+var selectedTile;
 var lastID;
 
 // Render variables
 var ren_camera = 0;
 var ren_tileChange = 0;
 
-// Some controler
+// Controler variables
 var raycaster = new THREE.Raycaster();
 var mouse = new THREE.Vector3();
 
@@ -188,6 +191,10 @@ function scaleTile(tile, c) {
     }
 }
 
+//////////////////////
+// Event Handlers
+//////////////////////
+
 /**
  * Render if there is a camera change
  */
@@ -259,6 +266,21 @@ function examineTile(i) {
     }
 }
 
+function onMouseUp(e) {
+    burn(selectedID);
+    console.log("Click");
+}
+
+function onMouseMove( event ) {
+
+    // calculate mouse position in normalized device coordinates
+    // (-1 to +1) for both components
+
+    mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+    mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+}
+
 /**
  * Show the index of the tile
  */
@@ -279,16 +301,6 @@ function showTileIndex() {
 
 init();
 animate();
-
-function onMouseMove( event ) {
-
-    // calculate mouse position in normalized device coordinates
-    // (-1 to +1) for both components
-
-    mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-    mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-
-}
 
 function init(){
 
@@ -359,11 +371,11 @@ function init(){
         var t = hexasphere.tiles[i];
         var latLon = t.getLatLon(hexasphere.radius);
 
-
         // Parse the color and the height
-        var color = getPixelAround(latLon.lat, latLon.lon, 5);
+        var color = new THREE.Color(getPixelAround(latLon.lat, latLon.lon, 5));
         var ratio = getGrayScaleAround(latLon.lat, latLon.lon, 5);
         t.baseColor = color;
+        t.color = color;
         t.height = MIN_HEIGHT + HEIGHT_RANGE * ratio;
     }
 
@@ -390,11 +402,12 @@ function init(){
         geometry.faces.push(new THREE.Face3(0, 4, 5));
 
         // Create the material
-        var material = new THREE.MeshBasicMaterial({side: THREE.DoubleSide, color: t.baseColor});
+        var material = new THREE.MeshBasicMaterial({side: THREE.DoubleSide, color: t.color});
 
         // Create the tile and add it to the scene.
         var tilemesh = new THREE.Mesh(geometry, material);
         tilemesh.id = i;
+        t.mesh = tilemesh;
         scene.add(tilemesh);
 
         // Also add it to meshsphere
@@ -420,6 +433,7 @@ function init(){
     // Render the first frame
     render();
 
+
 }
 
 /**
@@ -438,18 +452,18 @@ function animate(){
     raycaster.setFromCamera( mouse, camera );
 
     //calculate objects intersecting the picking ray
-    var intersects = raycaster.intersectObjects( scene.children );
+    intersects = raycaster.intersectObjects( scene.children );
 
     if (intersects.length > 0) {
         // Take the id of the first intersected object
-        var chosenID = intersects[0].object.id-3;
-        selectedTile = hexasphere.tiles[chosenID];
+        selectedID = intersects[0].object.id-3;
+        selectedTile = hexasphere.tiles[selectedID];
 
         // Change color if it's a different tile
-        if (chosenID != lastID) {
+        if (selectedID != lastID) {
 
             // Tile has changed, remove the old tile
-            scene.remove(selectionTile);
+            scene.remove(selectedMesh);
 
             // Create the geometry for the selected tile
             var geometry = new THREE.Geometry();
@@ -468,12 +482,12 @@ function animate(){
             var material = new THREE.MeshBasicMaterial({side: THREE.DoubleSide, color: 0xFFDF00});
 
             // Create the tile and add it to the scene.
-            selectionTile = new THREE.Mesh(geometry, material);
-            scene.add(selectionTile);
+            selectedMesh = new THREE.Mesh(geometry, material);
+            scene.add(selectedMesh);
 
             // Render the scene and then remove the tile
-            document.body.dispatchEvent(tileChange);
-            lastID = chosenID;
+            //document.body.dispatchEvent(tileChange);
+            lastID = selectedID;
 
             // Render the scene and then remove the tile
 
@@ -489,8 +503,10 @@ function animate(){
  * Render the Scene
  */
 function render() {
+    updateTiles();
     renderer.render( scene, camera );
 }
 
 window.addEventListener( 'mousemove', onMouseMove, false );
+window.addEventListener( 'mouseup', onMouseUp, true );
 window.requestAnimationFrame(render);

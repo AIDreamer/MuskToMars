@@ -35,7 +35,6 @@ var items = [
     {name: "Life", list: [life0, life1], mouseIsOver:false, mousePressedOver:false, mouseIsOverList:[], mousePressedOverList:[]}
 ];
 
-
 //Vars necessary for tiles functions begin here
 var budget = 0;
 var dBudget = 0;
@@ -64,9 +63,6 @@ tile1.neighbors.push(tile0, tile2, tile3);
 tile2.neighbors.push(tile0, tile1, tile3);
 tile3.neighbors.push(tile1, tile2);
 Tiles.push(tile0, tile1, tile2, tile3);
-
-
-
 
 function perpetualChange(){
     budget += dBudget;

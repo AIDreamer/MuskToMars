@@ -39,7 +39,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	this.target = new THREE.Vector3();
 
-	var EPS = 0.000001;
+	var EPS = -1;
 
 	var lastPosition = new THREE.Vector3();
 

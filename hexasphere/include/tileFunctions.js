@@ -120,37 +120,37 @@ function perpetualChange(){
     }
 }
 
-function fExplosive0(explosiveTileTarget){
+function fExplosive0(target){
 
     budget += explosive0.price;
     dBudget += explosive0.dPrice;
 
-    Tiles[explosiveTileTarget].temperature += 7; //*pow(10,-11);
-    Tiles[explosiveTileTarget].fallout += 10;
-    for (var i=0; i<Tiles[explosiveTileTarget].neighbors.length; i++){
-        Tiles[explosiveTileTarget].neighbors[i].fallout += 8;
+    Tiles[target].temperature += 7; //*pow(10,-11);
+    Tiles[target].fallout += 10;
+    for (var i=0; i<Tiles[target].neighbors.length; i++){
+        Tiles[target].neighbors[i].fallout += 8;
     }
-    Tiles[explosiveTileTarget]. altitude -= 2;
+    Tiles[target].altitude -= 2;
 }
 
-function fExplosive1(explosiveTileTarget){
+function fExplosive1(target){
     budget += explosive1.price;
     dBudget += explosive1.dPrice;
 
-    Tiles[explosiveTileTarget].temperature += 9; //*pow(10,-11);
-    Tiles[explosiveTileTarget].fallout += 12;
-    for (var i=0; i<Tiles[explosiveTileTarget].neighbors.length; i++){
-        Tiles[explosiveTileTarget].neighbors[i].fallout += 10;
+    Tiles[target].temperature += 9; //*pow(10,-11);
+    Tiles[target].fallout += 12;
+    for (var i=0; i<Tiles[target].neighbors.length; i++){
+        Tiles[target].neighbors[i].fallout += 10;
     }
-    Tiles[explosiveTileTarget]. altitude -= 3;
+    Tiles[target].altitude -= 3;
 }
 
-function fExplosive2(explosiveTileTarget){
+function fExplosive2(target){
     budget += explosive2.price;
     dBudget += explosive2.dPrice;
 
-    Tiles[explosiveTileTarget].temperature += 14; //*pow(10,-10);
-    Tiles[explosiveTileTarget]. altitude -= 5;
+    Tiles[target].temperature += 14; //*pow(10,-10);
+    Tiles[target].altitude -= 5;
 }
 
 function fMirror0(){
@@ -219,11 +219,11 @@ function fMeteor1(){
     }
 }
 
-function fMeteor2(meteorTileTarget){
+function fMeteor2(target){
     budget += meteor2.price;
     dBudget += meteor2.dPrice;
 
-    Tiles[meteorTileTarget].temperature += 10;
+    Tiles[target].temperature += 10;
     
     var index = items[2].list.indexOf(meteor2);
     if (index >-1) {items[2].list.splice(index,1);}

@@ -171,7 +171,7 @@ var Hexasphere = function(radius, numDivisions, hexSize){
         }
     }
 
-    faces = newFaces;
+    this.faces = newFaces;
 
     var newPoints = {};
     for(var p in points){
@@ -179,19 +179,77 @@ var Hexasphere = function(radius, numDivisions, hexSize){
         newPoints[np] = np;
     }
 
-    points = newPoints;
+    this.points = newPoints;
 
+    // Tile
     this.tiles = [];
 
     for(var p in points){
         this.tiles.push(new Tile(points[p], hexSize));
     }
 
+    // Cleanup the ID of all faces
+    this.faces.forEach(function(f) {
+        f.id -= 20; // First 20 faces no longer valuable
+    });
+
+    // Calculate neighbor matrix
+    var faceMatrix = new Array(this.faces.length).fill(0);
+    for (var i = 0; i < this.tiles.length; i++) {
+        this.tiles[i].faces.forEach(function(f){
+            if (faceMatrix[f.id] == 0) {
+                faceMatrix[f.id] = [];
+            }
+            faceMatrix[f.id].push(i);
+        });
+    }
+
+    var faceWithTwo = 0;
+    // Figure out adjacent tiles using the created matrix
+    for (var i = 0; i < faceMatrix.length; i++) {
+        var f = faceMatrix[i];
+        if (f.length == 2) {
+            f.push(0)
+        }
+        this.tiles[f[0]].neighbors.add(f[1]);
+        this.tiles[f[0]].neighbors.add(f[2]);
+        this.tiles[f[1]].neighbors.add(f[0]);
+        this.tiles[f[1]].neighbors.add(f[2]);
+        this.tiles[f[2]].neighbors.add(f[0]);
+        this.tiles[f[2]].neighbors.add(f[1]);
+    }
+
+    // Convert sets back to array
+    for (var i = 0; i < this.tiles.length; i++) {
+        this.tiles[i].neighbors = Array.from(this.tiles[i].neighbors);
+    }
+
+    // Calculate pointWiseNeighbors (Only possible if hexSize = 1
+    if (hexSize == 1) {
+        for (var i = 0; i < this.tiles.length; i++) {
+            var t = this.tiles[i];
+
+            for (var j = 0; j < t.boundary.length; j++) {
+                t.pointWiseNeighbors.push([]);
+                var p = t.boundary[j]
+
+                for (var k = 0; k < t.neighbors.length; k++) {
+                    var nb_t = this.tiles[t.neighbors[k]];
+
+                    for (var l = 0; l < nb_t.boundary.length; l++) {
+                        var nb_p = nb_t.boundary[l];
+
+                        if ((p.x == nb_p.x) && (p.y == nb_p.y) && (p.z == nb_p.z)) {
+                            t.pointWiseNeighbors[j].push(t.neighbors[k]);
+                        }
+                    }
+                }
+            }
+        }
+    }
 };
 
 module.exports = Hexasphere;
-
-
 
 /**
  *  Point
@@ -334,6 +392,10 @@ var Tile = function(centerPoint, hexSize){
     this.centerPoint = centerPoint;
     this.faces = centerPoint.getOrderedFaces();
     this.boundary = [];
+    this.neighbors = new Set();
+    this.pointWiseNeighbors = [];
+    this.height = 0;
+    this.baseColor = 0;
 
     this.triangles = [];
 

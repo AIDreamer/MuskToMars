@@ -1,3 +1,33 @@
+//////////////////////
+// Global variables
+//////////////////////
+
+// Scene variables
+var camera, controls, scene, renderer;
+
+// Image projection variables
+var img, projectionContext, projectionCanvas;
+var heightMap,heightContext, heightCanvas;
+var pixelData, heightData;
+
+// Hexasphere variable
+var hexasphere, selectionTile;
+var meshSphere = []; // Store all the mesh in the hexasphere
+
+// Events
+var tileChange;
+
+// Temporary storage variables
+var lastID;
+
+// Render variables
+var ren_camera = 0;
+var ren_tileChange = 0;
+
+// Some controler
+var raycaster = new THREE.Raycaster();
+var mouse = new THREE.Vector3();
+
 ////////////////////
 // Utility functions
 ////////////////////
@@ -61,7 +91,7 @@ var getGrayScaleAround = function (lat, lon, around) {
     var totalPixel = Math.pow(around + around, 2);
     for (var img_i = x - around; img_i < x + around; img_i++) {
         for (var img_j = y - around; img_j < y + around; img_j++) {
-            B += heightData.data[( (img_j % heightData.height) * heightData.width + (img_i % heightData.width)) * 4];
+            B += heightData.data[( ((img_j+heightData.height) % heightData.height) * heightData.width + (img_i % heightData.width)) * 4];
         }
     }
 
@@ -154,26 +184,94 @@ function scalePoint(point, c) {
  */
 function scaleTile(tile, c) {
     for (var i = 0; i < tile.boundary.length; i++) {
-        scalePoint(tile.boundary[i], c);
-        scalePoint(tile.boundary[i], c);
-        scalePoint(tile.boundary[i], c);
-        scalePoint(tile.boundary[i], c);
-        scalePoint(tile.boundary[i], c);
+        scalePoint(tile.boundary[i], c*c*c*c*c);
     }
 }
 
-//////////////////////
-// Global variables
-//////////////////////
+/**
+ * Render if there is a camera change
+ */
+function triggerCameraChange() {
+    ren_camera = true;
+}
 
-var camera, controls, scene, renderer;
-var img, projectionContext, projectionCanvas;
-var heightMap, heightCanvas, heightContext;
-var pixelData, heightData;
+/**
+ * Render if there is a tile change
+ */
+function triggerTileChange() {
+    ren_tileChange = true;
+}
 
-// Some controler
-var raycaster = new THREE.Raycaster();
-var mouse = new THREE.Vector3();
+/**
+ * Reset all triggers to 0
+ */
+function resetTrigers() {
+    ren_camera = false;
+    ren_tileChange = false;
+}
+
+/**
+ * Determine if the scene should be newly rendered
+ */
+function determineRender() {
+    return ren_camera && ren_tileChange;
+}
+
+/**
+ * Reshape tile according to average height
+ * @param tile
+ */
+function reshapeTile(tile) {
+    var height1, height2, index1, index2, averageHeight;
+    for (var i = 0; i < tile.boundary.length; i++) {
+        index1 = tile.pointWiseNeighbors[i][0];
+        index2 = tile.pointWiseNeighbors[i][1];
+        height1 = hexasphere.tiles[index1].height;
+        height2 = hexasphere.tiles[index2].height;
+        averageHeight = (tile.height + height1 + height2) / 3;
+        scalePoint(tile.boundary[i], Math.pow(averageHeight / BASE_HEIGHT, 5));
+    }
+}
+
+/**
+ * Print out valuable informations about a tile of index i
+ * @param i
+ */
+function examineTile(i) {
+    var t = hexasphere.tiles[i];
+
+    var R = Math.floor(255 * Math.random(1));
+    var G = Math.floor(255 * Math.random(1));
+    var B = Math.floor(255 * Math.random(1));
+
+    var color = {r: R, g: G, b: B, a: 1}
+
+    console.log(t.neighbors);
+    console.log(t.boundary);
+    console.log(t.faces);
+    console.log(t.pointWiseNeighbors);
+
+    for (var j = 0; j < t.boundary.length; j ++) {
+        // Create the sprite that shows
+        var sprite = makeTextSprite("Point" + j, {fontsize: 32, backgroundColor: color});
+        sprite.position = t.boundary[j];
+        scene.add(sprite);
+    }
+}
+
+/**
+ * Show the index of the tile
+ */
+function showTileIndex() {
+    for (var i = 0; i < hexasphere.tiles.length; i++) {
+        var t = hexasphere.tiles[i];
+
+        // Create the sprite that shows
+        var sprite = makeTextSprite(" " + i + " ", {fontsize: 32, backgroundColor: {r: 255, g: 100, b: 0, a: 1}});
+        sprite.position = t.centerPoint;
+        scene.add(sprite);
+    }
+}
 
 ////////////////////
 // Three.js code
@@ -201,8 +299,9 @@ function init(){
     var width = window.innerWidth;
     var height = window.innerHeight - 10;
 
-    renderer = new THREE.WebGLRenderer();
+    renderer = new THREE.WebGLRenderer({antialias: true});
     renderer.setSize(width, height);
+    renderer.setClearColor( 0xffffff, 1 );
     document.body.appendChild(renderer.domElement);
 
     /***************
@@ -216,11 +315,19 @@ function init(){
 
     // Scene and fog code
     scene = new THREE.Scene();
-    scene.fog = new THREE.Fog(0x000000, cameraDistance * .4, cameraDistance * 1.2);
+    scene.fog = new THREE.Fog(0xffffff, cameraDistance * .4, cameraDistance * 1.2);
 
     // Trackball
     controls = new THREE.TrackballControls( camera );
     controls.addEventListener('change', render);
+
+    /****************
+     * Mouse events
+     ****************/
+
+    // Create the event for tile change
+    tileChange = new CustomEvent("tilechange");
+    document.body.addEventListener('tilechange', render);
 
     /***************
      * Object code
@@ -245,22 +352,29 @@ function init(){
     heightContext.drawImage(heightMap, 0, 0, heightMap.width, heightMap.height);
 
     // Create the hexasphere
-    var hexasphere = new Hexasphere(BASE_HEIGHT, RESOLUTION, 1);
-    console.log(hexasphere);
-    for (var i = 0; i < hexasphere.tiles.length; i++) {
-        console.log(i, hexasphere.tiles[i].neighbors);
-    }
+    hexasphere = new Hexasphere(BASE_HEIGHT, RESOLUTION, HEX_SIZE);
 
     // Parsing color and height for each tile
     for (var i = 0; i < hexasphere.tiles.length; i++) {
         var t = hexasphere.tiles[i];
         var latLon = t.getLatLon(hexasphere.radius);
 
+
         // Parse the color and the height
         var color = getPixelAround(latLon.lat, latLon.lon, 5);
-        var height = getGrayScaleAround(latLon.lat, latLon.lon, 5);
-        t.height = MIN_HEIGHT + HEIGHT_RANGE * height;
-        scaleTile(t, t.height / BASE_HEIGHT);
+        var ratio = getGrayScaleAround(latLon.lat, latLon.lon, 5);
+        t.baseColor = color;
+        t.height = MIN_HEIGHT + HEIGHT_RANGE * ratio;
+    }
+
+    for (var i = 0; i < hexasphere.tiles.length; i++) {
+        var t = hexasphere.tiles[i];
+        reshapeTile(t);
+    };
+
+    for (var i = 0; i < hexasphere.tiles.length; i++) {
+
+        var t = hexasphere.tiles[i];
 
         // Create the geometry for each tile
         var geometry = new THREE.Geometry();
@@ -276,48 +390,107 @@ function init(){
         geometry.faces.push(new THREE.Face3(0, 4, 5));
 
         // Create the material
-        var material = new THREE.MeshBasicMaterial({side: THREE.DoubleSide, color: color});
+        var material = new THREE.MeshBasicMaterial({side: THREE.DoubleSide, color: t.baseColor});
 
         // Create the tile and add it to the scene.
         var tilemesh = new THREE.Mesh(geometry, material);
+        tilemesh.id = i;
         scene.add(tilemesh);
 
-        // Create the sprite that shows
-        //var sprite = makeTextSprite( " " + i + " ", { fontsize: 32, backgroundColor: {r:255, g:100, b:100, a:1} } );
-        //sprite.position = t.centerPoint;
-        //scene.add(sprite);
-    }
+        // Also add it to meshsphere
+        meshSphere.push(tilemesh);
 
-    var mesh = new THREE.Mesh( geometry, material);
-    scene.add(mesh);
+    };
+
+    console.log(meshSphere);
+
+    // Set up temporaries variables
+    lastID = 0;
+    lastTile = hexasphere.tiles[0];
+    lastMesh = meshSphere[0];
+
+    //update the picking ray with the camera and mouse position
+    raycaster.setFromCamera( mouse, camera );
+
+    //calculate objects intersecting the picking ray
+    var intersects = raycaster.intersectObjects( scene.children );
+
+    console.log(intersects);
 
     // Render the first frame
     render();
 
 }
 
+/**
+ * Changes the state of objects inside the program
+ */
 function animate(){
     requestAnimationFrame( animate );
+
+    // Reset all triggers
+    resetTrigers();
+
+    // Update changes from TrackingBalls
     controls.update();
-}
 
-function render() {
-
-    // update the picking ray with the camera and mouse position
+    //update the picking ray with the camera and mouse position
     raycaster.setFromCamera( mouse, camera );
 
-    // calculate objects intersecting the picking ray
+    //calculate objects intersecting the picking ray
     var intersects = raycaster.intersectObjects( scene.children );
 
-    for ( var i = 0; i < intersects.length; i++ ) {
+    if (intersects.length > 0) {
+        // Take the id of the first intersected object
+        var chosenID = intersects[0].object.id-3;
+        selectedTile = hexasphere.tiles[chosenID];
 
-        intersects[ i ].object.material.color.set( 0xff0000 );
+        // Change color if it's a different tile
+        if (chosenID != lastID) {
 
+            // Tile has changed, remove the old tile
+            scene.remove(selectionTile);
+
+            // Create the geometry for the selected tile
+            var geometry = new THREE.Geometry();
+            for (var j = 0; j < selectedTile.boundary.length; j++) {
+                var bp = selectedTile.boundary[j];
+                geometry.vertices.push(new THREE.Vector3(bp.x, bp.y, bp.z));
+            }
+            geometry.vertices.push(new THREE.Vector3(selectedTile.boundary[0].x, selectedTile.boundary[0].y, selectedTile.boundary[0].z));
+
+            geometry.faces.push(new THREE.Face3(0, 1, 2));
+            geometry.faces.push(new THREE.Face3(0, 2, 3));
+            geometry.faces.push(new THREE.Face3(0, 3, 4));
+            geometry.faces.push(new THREE.Face3(0, 4, 5));
+
+            // Create the material
+            var material = new THREE.MeshBasicMaterial({side: THREE.DoubleSide, color: 0xFFDF00});
+
+            // Create the tile and add it to the scene.
+            selectionTile = new THREE.Mesh(geometry, material);
+            scene.add(selectionTile);
+
+            // Render the scene and then remove the tile
+            document.body.dispatchEvent(tileChange);
+            lastID = chosenID;
+
+            // Render the scene and then remove the tile
+
+        }
     }
 
+    if (determineRender()) {
+        render();
+    }
+}
+
+/**
+ * Render the Scene
+ */
+function render() {
     renderer.render( scene, camera );
 }
 
 window.addEventListener( 'mousemove', onMouseMove, false );
-
 window.requestAnimationFrame(render);

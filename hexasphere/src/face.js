@@ -1,5 +1,3 @@
-var Point = require('./point');
-
 var _faceCount = 0;
 
 var Face = function(point1, point2, point3, register){
@@ -13,7 +11,7 @@ var Face = function(point1, point2, point3, register){
         point1,
         point2,
         point3
-        ];
+    ];
     if(register){
         point1.registerFace(this);
         point2.registerFace(this);
@@ -29,7 +27,7 @@ Face.prototype.getOtherPoints = function(point1){
         }
     }
     return other;
-}
+};
 
 Face.prototype.findThirdPoint = function(point1, point2){
     for(var i = 0; i < this.points.length; i++){
@@ -37,23 +35,23 @@ Face.prototype.findThirdPoint = function(point1, point2){
             return this.points[i];
         }
     }
-}
+};
 
 Face.prototype.isAdjacentTo = function(face2){
     // adjacent if 2 of the points are the same
-    
+
     var count = 0;
     for(var i = 0; i< this.points.length; i++){
         for(var j =0 ; j< face2.points.length; j++){
             if(this.points[i].toString() == face2.points[j].toString()){
                 count++;
-                
+
             }
         }
     }
 
     return (count == 2);
-}
+};
 
 Face.prototype.getCentroid = function(clear){
     if(this.centroid && !clear){
@@ -68,7 +66,4 @@ Face.prototype.getCentroid = function(clear){
     this.centroid = centroid;
 
     return centroid;
-
-}
-
-module.exports = Face;
+};

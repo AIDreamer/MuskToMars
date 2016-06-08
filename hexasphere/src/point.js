@@ -1,3 +1,6 @@
+/**
+ *  Point
+ */
 var Point = function(x,y,z){
     if(x !== undefined && y !== undefined && z !== undefined){
         this.x = x;
@@ -7,7 +10,7 @@ var Point = function(x,y,z){
     }
 
     this.faces = [];
-}
+};
 
 Point.prototype.subdivide = function(point, count, checkPoint){
 
@@ -26,7 +29,7 @@ Point.prototype.subdivide = function(point, count, checkPoint){
 
     return segments;
 
-}
+};
 
 Point.prototype.segment = function(point, percent){
     var newPoint = new Point();
@@ -41,7 +44,7 @@ Point.prototype.segment = function(point, percent){
 
 Point.prototype.midpoint = function(point, location){
     return this.segment(point, .5);
-}
+};
 
 
 Point.prototype.project = function(radius, percent){
@@ -66,7 +69,7 @@ Point.prototype.project = function(radius, percent){
 
 Point.prototype.registerFace = function(face){
     this.faces.push(face);
-}
+};
 
 Point.prototype.getOrderedFaces = function(){
     var workingArray = this.faces.slice();
@@ -93,7 +96,7 @@ Point.prototype.getOrderedFaces = function(){
     }
 
     return ret;
-}
+};
 
 Point.prototype.findCommonFace = function(other, notThisFace){
     for(var i = 0; i< this.faces.length; i++){
@@ -105,13 +108,11 @@ Point.prototype.findCommonFace = function(other, notThisFace){
     }
 
     return null;
-}
+};
 
 
 
 Point.prototype.toString = function(){
     return "" + Math.round(this.x*100)/100 + "," + Math.round(this.y*100)/100 + "," + Math.round(this.z*100)/100;
 
-}
-
-module.exports = Point;
+};

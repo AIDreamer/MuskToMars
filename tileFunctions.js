@@ -53,8 +53,6 @@ var meteorStationCompleted = false;
 var analyzingMeteor = false;
 var meteorAnalysisProgress = 0;
 
-var turn = 0;
-
 var Tiles = [];
 var tile0 = {water: false, altitude:100, earthDensity:0, temperature:meanTemp, atmP:0, oxygenP:0, fallout:0, neighbors:[]};
 var tile1 = {water: false, altitude:100, earthDensity:0, temperature:meanTemp, atmP:0, oxygenP:0, fallout:0, neighbors:[]};
@@ -108,8 +106,10 @@ function perpetualChange(){
 
     //Nuclear fallout
     for (var i=0; i<Tiles.length; i++){
-        if (Tiles[i].fallout>0) {Tiles[i].fallout--;}
+        if (Tiles[i].fallout>0) {Tiles[i].fallout *= ( Math.pow(0.5, 1/300));} //1 frame = 1 month. Half life is 25 years.
+        //if (fallout < 1) nuclearHabitable = true;
 
+        //temperature
         for (var j=0; j<Tiles[i].neighbors.length; j++){
             if (Tiles[i].temperature < Tiles[i].neighbors[j].temperature){
                 Tiles[i].temperature += (Math.max(Tiles[i].temperature, Tiles[i].neighbors[j].temperature) - Math.min(Tiles[i].temperature, Tiles[i].neighbors[j].temperature))/4;

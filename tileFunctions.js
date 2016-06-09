@@ -107,8 +107,10 @@ function perpetualChange(){
 
     //Nuclear fallout
     for (var i=0; i<Tiles.length; i++){
-        if (Tiles[i].fallout>0) {Tiles[i].fallout--;}
+        if (Tiles[i].fallout>0) {Tiles[i].fallout *= ( Math.pow(0.5, 1/300));} //1 frame = 1 month. Half life is 25 years.
+        //if (fallout < 1) nuclearHabitable = true;
 
+        //temperature
         for (var j=0; j<Tiles[i].neighbors.length; j++){
             if (Tiles[i].temperature < Tiles[i].neighbors[j].temperature){
                 Tiles[i].temperature += (Math.max(Tiles[i].temperature, Tiles[i].neighbors[j].temperature) - Math.min(Tiles[i].temperature, Tiles[i].neighbors[j].temperature))/4;
@@ -121,7 +123,6 @@ function perpetualChange(){
 }
 
 function fExplosive0(explosiveTileTarget){
-
     budget += explosive0.price;
     dBudget += explosive0.dPrice;
 

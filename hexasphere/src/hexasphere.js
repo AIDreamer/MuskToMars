@@ -134,14 +134,14 @@ var Hexasphere = function(radius, numDivisions, hexSize){
         this.tiles[i].neighbors = Array.from(this.tiles[i].neighbors);
     }
 
-    // Calculate pointWiseNeighbors (Only possible if hexSize = 1
+    // Calculate pointWiseNeighbors (Only possible if hexSize = 1)
     if (hexSize == 1) {
         for (var i = 0; i < this.tiles.length; i++) {
             var t = this.tiles[i];
 
             for (var j = 0; j < t.boundary.length; j++) {
-                t.pointWiseNeighbors.push([]);
-                var p = t.boundary[j]
+                    t.pointWiseNeighbors.push([]);
+                    var p = t.boundary[j]
 
                 for (var k = 0; k < t.neighbors.length; k++) {
                     var nb_t = this.tiles[t.neighbors[k]];

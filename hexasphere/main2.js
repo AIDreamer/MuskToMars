@@ -191,39 +191,6 @@ function scaleTile(tile, c) {
     }
 }
 
-//////////////////////
-// Event Handlers
-//////////////////////
-
-/**
- * Render if there is a camera change
- */
-function triggerCameraChange() {
-    ren_camera = true;
-}
-
-/**
- * Render if there is a tile change
- */
-function triggerTileChange() {
-    ren_tileChange = true;
-}
-
-/**
- * Reset all triggers to 0
- */
-function resetTrigers() {
-    ren_camera = false;
-    ren_tileChange = false;
-}
-
-/**
- * Determine if the scene should be newly rendered
- */
-function determineRender() {
-    return ren_camera && ren_tileChange;
-}
-
 /**
  * Reshape tile according to average height
  * @param tile
@@ -266,20 +233,7 @@ function examineTile(i) {
     }
 }
 
-function onMouseUp(e) {
-    burn(selectedID);
-    console.log("Click");
-}
 
-function onMouseMove( event ) {
-
-    // calculate mouse position in normalized device coordinates
-    // (-1 to +1) for both components
-
-    mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-    mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-
-}
 
 /**
  * Show the index of the tile
@@ -294,6 +248,54 @@ function showTileIndex() {
         scene.add(sprite);
     }
 }
+
+//////////////////////
+// Event Handlers
+//////////////////////
+
+/**
+ * Render if there is a camera change
+ */
+function triggerCameraChange() {
+    ren_camera = true;
+}
+
+/**
+ * Render if there is a tile change
+ */
+function triggerTileChange() {
+    ren_tileChange = true;
+}
+
+/**
+ * Reset all triggers to 0
+ */
+function resetTrigers() {
+    ren_camera = false;
+    ren_tileChange = false;
+}
+
+/**
+ * Determine if the scene should be newly rendered
+ */
+function determineRender() {
+    return ren_camera && ren_tileChange;
+}
+
+function onMouseUp(e) {
+    burn(selectedID);
+    console.log("Click");
+}
+
+function onMouseMove( event ) {
+
+    // calculate mouse position in normalized device coordinates
+    // (-1 to +1) for both components
+
+    mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+    mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+};
 
 ////////////////////
 // Three.js code
@@ -400,9 +402,20 @@ function init(){
         geometry.faces.push(new THREE.Face3(0, 2, 3));
         geometry.faces.push(new THREE.Face3(0, 3, 4));
         geometry.faces.push(new THREE.Face3(0, 4, 5));
+        geometry.computeFaceNormals();
 
-        // Create the material
-        var material = new THREE.MeshBasicMaterial({side: THREE.DoubleSide, color: t.color});
+        // Check the ace direction to make sure it has the right face culling
+        var dirVector = new THREE.Vector3(t.centerPoint.x, t.centerPoint.y, t.centerPoint.z);
+        var dir = dirVector.dot(geometry.faces[0].normal);
+
+        if (dir < 0) {
+            // Create the material with THREE.BackSide
+            var material = new THREE.MeshBasicMaterial({side: THREE.BackSide, color: t.color});
+        } else {
+            var material = new THREE.MeshBasicMaterial({side: THREE.FrontSide, color: t.color});
+        }
+
+
 
         // Create the tile and add it to the scene.
         var tilemesh = new THREE.Mesh(geometry, material);
@@ -410,25 +423,24 @@ function init(){
         t.mesh = tilemesh;
         scene.add(tilemesh);
 
+        // Determine the front
+        var matrix = new THREE.Matrix4();
+        matrix.extractRotation( tilemesh.matrix );
+
+        var direction = new THREE.Vector3( 0, 0, 1 );
+        direction = direction.applyMatrix4( matrix );
+
         // Also add it to meshsphere
         meshSphere.push(tilemesh);
 
     };
-
-    console.log(meshSphere);
 
     // Set up temporaries variables
     lastID = 0;
     lastTile = hexasphere.tiles[0];
     lastMesh = meshSphere[0];
 
-    //update the picking ray with the camera and mouse position
-    raycaster.setFromCamera( mouse, camera );
-
-    //calculate objects intersecting the picking ray
-    var intersects = raycaster.intersectObjects( scene.children );
-
-    console.log(intersects);
+    //showTileIndex()
 
     // Render the first frame
     render();
@@ -490,7 +502,6 @@ function animate(){
             lastID = selectedID;
 
             // Render the scene and then remove the tile
-
         }
     }
 

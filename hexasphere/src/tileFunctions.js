@@ -15,6 +15,38 @@ var Item = function(itemName, img, price, dPrice) {
     this.dPrice = dPrice;
 }
 
+var Explosive = function(itemName, img, temp) {
+    this.itemName = itemName;
+    this.img = img;
+    this.price = price;
+    this.dPrice = dPrice;
+
+    // Specific variables
+    this.temperature = 7;
+
+};
+
+var Meteor = function(itemName, img, temp) {
+    this.itemName = itemName;
+    this.img = img;
+    this.price = price;
+    this.dPrice = dPrice;
+
+    // Specific variables
+    this.impact = 7;
+
+};
+
+var explosiveArray = [];
+explosiveArray.push(new Explosive("ten", "anh", 21000000, 0));
+explosiveArray.push(new Explosive("ten", "anh", 21000000, 0));
+explosiveArray.push(new Explosive("ten", "anh", 21000000, 0));
+explosiveArray.push(new Explosive("ten", "anh", 21000000, 0));
+explosiveArray.push(new Explosive("ten", "anh", 21000000, 0));
+explosiveArray.push(new Explosive("ten", "anh", 21000000, 0));
+explosiveArray.push(new Explosive("ten", "anh", 21000000, 0));
+
+
 var explosive0 = new Item("Nuclear Fission Bomb", "Image var", 210000000, 0);
 var explosive1 = new Item("Boosted Fission Bomb", "Image var", 260000000, 0);
 var explosive2 = new Item("Hydrogen Bomb", "Image var", 400000000, 0);
@@ -116,6 +148,24 @@ function perpetualChange(){
     }
 }
 
+/**
+ *
+ * @param explosiveTileTarget
+ */
+function fExplosive0_bomb1(explosiveTileTarget){
+
+    budget += explosive0.price;
+    dBudget += explosive0.dPrice;
+
+    Tiles[explosiveTileTarget].temperature += 7; //*pow(10,-11);
+    Tiles[explosiveTileTarget].fallout += 10;
+    for (var i=0; i<Tiles[explosiveTileTarget].neighbors.length; i++){
+        Tiles[explosiveTileTarget].neighbors[i].fallout += 8;
+    }
+    Tiles[explosiveTileTarget].altitude -= 2;
+}
+
+
 function fExplosive0(explosiveTileTarget){
 
     budget += explosive0.price;
@@ -128,6 +178,8 @@ function fExplosive0(explosiveTileTarget){
     }
     Tiles[explosiveTileTarget]. altitude -= 2;
 }
+
+
 
 function fExplosive1(explosiveTileTarget){
     budget += explosive1.price;
@@ -229,7 +281,6 @@ function fMeteor2(meteorTileTarget){
 /**
  * Test functions
  */
-
 function mouseClicked(){
     perpetualChange();
     if (mouseOverExplosive0){explosive0(0);}

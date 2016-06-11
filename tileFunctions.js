@@ -7,76 +7,175 @@
 
 //Check altitude commands in final version
 
-//This stuff is from sketch3
-var Item = function(itemName, img, price, dPrice) {
-    this.itemName = itemName;
-    this.img = img;
-    this.price = price;
-    this.dPrice = dPrice;
-}
-
-var explosive0 = new Item("Nuclear Fission Bomb", "Image var", 210000000, 0);
-var explosive1 = new Item("Boosted Fission Bomb", "Image var", 260000000, 0);
-var explosive2 = new Item("Hydrogen Bomb", "Image var", 400000000, 0);
-var mirror0 = new Item("Construct: Space Station - Mirror Manufacturing", "Image var", 100000000000, 0); //100B
-var mirror1 = new Item("Fund Construction of Orbital Mirror", "Image var", 0, 80000000000); //80B
-var meteor0 = new Item("Construct: Space Station - Meteor Analysis", "Image var", 100000000000, 0); //100B
-var meteor1 = new Item("Analyze Meteor", "Image var", 0, 500000000); //500M
-var meteor2 = new Item("Deliver Ammonia Meteor to Mars", 800000000, 0); //800M
-var pyrolysis0 = new Item("Pyrolyze: Mars' earth", "Image var", 0, 500000000); //500M
-var life0 = new Item("Moss", "Image Var", 0, 0);
-var life1 = new Item("Advanced plants", "Image var", 0, 0);
-
-var items = [
-    {name: "Explosives", list: [explosive0, explosive1, explosive2], mouseIsOver:false, mousePressedOver:false, mouseIsOverList:[], mousePressedOverList:[]},
-    {name: "Orbital Mirror", list: [mirror0], mouseIsOver:false, mousePressedOver:false, mouseIsOverList:[], mousePressedOverList:[]},
-    {name: "Meteor", list: [meteor0], mouseIsOver:false, mousePressedOver:false, mouseIsOverList:[], mousePressedOverList:[]},
-    {name: "Pyrolysis", list: [pyrolysis0], mouseIsOver:false, mousePressedOver:false, mouseIsOverList:[], mousePressedOverList:[]},
-    {name: "Life", list: [life0, life1], mouseIsOver:false, mousePressedOver:false, mouseIsOverList:[], mousePressedOverList:[]}
+/**
+ * Items vars & lists
+ */
+var Explosives = [
+    {name:"Nuclear Fission Bomb", img: "Image var", price: 210000000, dPrice: 0, effect:true, tmp: 7*Math.pow(10,-11), fallout:8, altitude: -0.2 },
+    {name:"Boosted Fission Bomb", img: "Image var", price: 260000000, dPrice: 0, effect:true, tmp: 9*Math.pow(10,-11), fallout:10, altitude: -0.4 },
+    {name:"Hydrogen Bomb", img: "Image var", price: 400000000, dPrice: 0, effect:true, tmp: 14*Math.pow(10,-10), fallout:0, altitude: -0.8}
+];
+var Mirrors = [
+    {name:"Construct: Space Station - Mirror Manufacturing", img: "Image var", price: 100000000000, dPrice: 0, effect:false, tmp: 0},
+    {name:"Construct: Orbital Mirror", img: "Image var", price: 0, dPrice: 80000000000, effect:false, tmp: 0},
+    {name:"Select Mirror Target", img: "Image var", price: 0, dPrice: 0, effect:true, tmp: 0}
+];
+var Meteors = [
+    {name:"Construct: Space Station - Meteor Analysis", img: "Image var", price: 100000000000, dPrice: 0, effect:false, tmp: 0},
+    {name:"Analyze Meteor", img: "Image var", price: 0, dPrice: 500000000, effect:false, tmp: 0},
+    {name:"Send Ammonia Meteor to Mars", img: "Image var", price: 0, dPrice: 500000000, effect:true, tmp: 0}
+];
+var Pyrolysis = [
+    {name:"Pyrolyze: Mars' earth", img: "Image var", price: 0, dPrice: 1000000000, effect:true, tmp: 0}
+];
+var Lives = [
+    {name:"Moss", img: "Image var", price: 0, dPrice: 0, growth:5},
+    {name:"Advanced Plants", img: "Image var", price: 0, dPrice: 0, growth:10}
 ];
 
+var Items = [
+    {name: "Explosives", list: [], mouseIsOver:false, mousePressedOver:false, mouseIsOverList:[], mousePressedOverList:[]},
+    {name: "Orbital Mirror", list: [], mouseIsOver:false, mousePressedOver:false, mouseIsOverList:[], mousePressedOverList:[]},
+    {name: "Meteor", list: [], mouseIsOver:false, mousePressedOver:false, mouseIsOverList:[], mousePressedOverList:[]},
+    {name: "Pyrolysis", list: [], mouseIsOver:false, mousePressedOver:false, mouseIsOverList:[], mousePressedOverList:[]},
+    {name: "Life", list: [], mouseIsOver:false, mousePressedOver:false, mouseIsOverList:[], mousePressedOverList:[]}
+];
 
-//Vars necessary for tiles functions begin here
+for (var i = 0; i< Explosives.length; i++) {
+    Items[0].list.push(Explosives[i]);
+}
+Items[1].list.push(Mirrors[0]);
+Items[2].list.push(Meteors[0]);
+for (var i = 0; i< Pyrolysis.length; i++){
+    Items[3].list.push(Pyrolysis[i]);
+}
+for (var i = 0; i< Lives.length; i++){
+    Items[4].list.push(Lives[i]);
+}
+
+/**
+ * Vars necessary for tiles functions
+ */
 var budget = 0;
 var dBudget = 0;
-var meanTemp = 216.5;
 
-var mirrorStationBuilding = false;
-var mirrorStationProgress = -1;
-var mirrorStationCompleted = false;
+var mirrorSSBuilding = false;
+var mirrorSSProgress = -1;
+var mirrorSSCompleted = false;
 var mirrorBuilding = false;
 var mirrorRadius = 0;
+var mirrorCompleted = false;
 
-var meteorStationBuilding = false;
-var meteorStationProgress = -1;
-var meteorStationCompleted = false;
+var meteorSSBuilding = false;
+var meteorSSProgress = -1;
+var meteorSSCompleted = false;
 var analyzingMeteor = false;
 var meteorAnalysisProgress = 0;
 
-var turn = 0;
-
-var tile0 = {water: false, altitude:100, earthDensity:0, temperature:meanTemp, atmP:0, oxygenP:0, fallout:0, neighbors:[]};
-var tile1 = {water: false, altitude:100, earthDensity:0, temperature:meanTemp, atmP:0, oxygenP:0, fallout:0, neighbors:[]};
-var tile2 = {water: false, altitude:100, earthDensity:0, temperature:meanTemp, atmP:0, oxygenP:0, fallout:0, neighbors:[]};
-var tile3 = {water: false, altitude:100, earthDensity:0, temperature:meanTemp, atmP:0, oxygenP:0, fallout:0, neighbors:[]};
+/**
+ * Vars for testing
+ * Units: altitude: km, lifeforce: arbitrary; atmP: bar; oxygen: mbar; fallout: arbitrary, but decay remains true to half-life cycle and approximate time; temperature: Kelvin.
+ */
+var meanTemp = 216.5;
+var tile0 = {ice: false, water: false, waterAccess:false, altitude:3390, pyrolyzing: false, habitable: -1, lifeForce: 0, moss: 0, plants: 0, temperature:meanTemp, atmP:0, oxygen:0, fallout:0, neighbors:[]};
+var tile1 = {ice: false, water: false, waterAccess:false, altitude:3380, pyrolyzing: false, habitable: -1, lifeForce: 0, moss: 0, plants: 0, temperature:meanTemp, atmP:0, oxygen:0, fallout:0, neighbors:[]};
+var tile2 = {ice: false, water: false, waterAccess:false, altitude:3370, pyrolyzing: false, habitable: -1, lifeForce: 0, moss: 0, plants: 0, temperature:meanTemp, atmP:0, oxygen:0, fallout:0, neighbors:[]};
+var tile3 = {ice: true , water: false, waterAccess:false, altitude:3350, pyrolyzing: false, habitable: -1, lifeForce: 0, moss: 0, plants: 0, temperature:meanTemp, atmP:0, oxygen:0, fallout:0, neighbors:[]};
 tile0.neighbors.push(tile1, tile2);
 tile1.neighbors.push(tile0, tile2, tile3);
 tile2.neighbors.push(tile0, tile1, tile3);
 tile3.neighbors.push(tile1, tile2);
+var Tiles = [];
 Tiles.push(tile0, tile1, tile2, tile3);
 
 
-
-
+/**
+ * Effects before each turn
+ */
 function perpetualChange(){
+    /**
+     * Keep track of budget
+     */
     budget += dBudget;
 
-    //Control starting and halting of mirror S.S./mirror construction
-    if (mirrorStationBuilding && mirrorStationProgress>-1 && mirrorStationProgress<240) {mirrorStationProgress++;}
-    if (mirrorStationProgress===240){
-        mirrorStationCompleted = true;
+    /**
+     * Keep track of tile variable
+     */
+    for (var i=0; i<Tiles.length; i++){
+        //Nuclear fallout
+        if (Tiles[i].fallout>0) {Tiles[i].fallout *= ( Math.pow(0.5, 1/300));} //1 frame = 1 month. Half life is 25 years.
+
+        //Temperature spread (between 2 neighbors, warmer tile gives temperature to cooler tile)
+        for (var j=0; j<Tiles[i].neighbors.length; j++){
+            if (Tiles[i].temperature < Tiles[i].neighbors[j].temperature){
+                Tiles[i].temperature += (Math.max(Tiles[i].temperature, Tiles[i].neighbors[j].temperature) - Math.min(Tiles[i].temperature, Tiles[i].neighbors[j].temperature))/4;
+                Tiles[i].neighbors[j].temperature -= (Math.max(Tiles[i].temperature, Tiles[i].neighbors[j].temperature) - Math.min(Tiles[i].temperature, Tiles[i].neighbors[j].temperature))/4;
+            }
+            else if (Tiles[i].temperature > Tiles[i].neighbors[j].temperature){
+                Tiles[i].temperature -= (Math.max(Tiles[i].temperature, Tiles[i].neighbors[j].temperature) - Math.min(Tiles[i].temperature, Tiles[i].neighbors[j].temperature))/4;
+                Tiles[i].neighbors[j].temperature += (Math.max(Tiles[i].temperature, Tiles[i].neighbors[j].temperature) - Math.min(Tiles[i].temperature, Tiles[i].neighbors[j].temperature))/4;
+            }
+        }
+
+        //Water
+        if (Tiles[i].ice && Tiles[i].temperature >= 240){
+            Tiles[i].ice = false;
+            Tiles[i].water = true;
+        }
+
+        //Water access
+        if (Tiles[i].farNeighbors.water) {Tiles[i].waterAccess = true}
+
+        //Oxygen spread (between 2 neighbors, tile with higher O2 concentration gives to tile with lower)
+        for (var j=0; j<Tiles[i].neighbors.length; j++){
+            if (Tiles[i].oxygen < Tiles[i].neighbors[j].oxygen){
+                Tiles[i].oxygen += (Math.max(Tiles[i].oxygen, Tiles[i].neighbors[j].oxygen) - Math.min(Tiles[i].oxygen, Tiles[i].neighbors[j].temperature))/3;
+                Tiles[i].neighbors[j].oxygen -= (Math.max(Tiles[i].oxygen, Tiles[i].neighbors[j].oxygen) - Math.min(Tiles[i].oxygen, Tiles[i].neighbors[j].temperature))/3;
+            }
+            else if (Tiles[i].oxygen > Tiles[i].neighbors[j].oxygen){
+                Tiles[i].oxygen -= (Math.max(Tiles[i].oxygen, Tiles[i].neighbors[j].oxygen) - Math.min(Tiles[i].oxygen, Tiles[i].neighbors[j].temperature))/3;
+                Tiles[i].neighbors[j].oxygen += (Math.max(Tiles[i].oxygen, Tiles[i].neighbors[j].oxygen) - Math.min(Tiles[i].oxygen, Tiles[i].neighbors[j].temperature))/3;
+            }
+        }
+
+        //Habitability
+        if (Tiles[i].temperature >= 250 && Tiles[i].oxygen >= 1 && Tiles[i].waterAccess && Tiles[i].fallout < 1) {
+            Tiles[i].habitable = 0; //Moss habitable
+        }
+        if (Tiles[i].temperature >= 270 && Tiles[i].oxygen >= 1.5 && Tiles[i].waterAccess && Tiles[i].fallout < 1) {
+            Tiles[i].habitable = 1; //Advanced plants habitable
+        }
+        if (Tiles[i].temperature >= 285 && Tiles[i].oxygen >= 120 && Tiles[i].waterAccess && Tiles[i].fallout < 1) {
+            Tiles[i].habitable = 2; //Human habitable
+        }
+
+        //Life force, increase if tile is habitable, capped at 50, and decreases if tile is inhabitable
+        if (Tiles[i].habitable){
+            if (Tiles[i].lifeForce < 50) {Tiles[i].lifeForce += Tiles[i].moss * Lives[0].growth + Tiles[i].plants * Lives[1].growth;}
+            if (Tiles[i].lifeForce > 50) {Tiles[i].lifeForce = 50;}
+        }
+        else{
+            Tiles[i].lifeForce -= 10;
+        }
+
+        //Oxygen production by pyrolysis and plants
+        if (Tiles[i].pyrolyzing){
+            Tiles[i].oxygen += 0.1;
+        }
+        Tiles[i].oxygen += (Tiles[i].lifeForce/1000);
     }
-    if (mirrorBuilding){
+
+    //Mirror S.S. construction on/off
+    if (mirrorSSBuilding && mirrorSSProgress<240) {mirrorSSProgress++;}
+    if (mirrorSSProgress===240 && !mirrorSSCompleted){
+        mirrorSSCompleted = true;
+        mirrorSSBuilding = false;
+        dBudget -= Mirrors[0].dPrice;
+        Items[1].list.push(Mirrors[1]);
+    }
+
+    //Mirror construction on/off
+    if (mirrorBuilding && !mirrorCompleted){
         if (mirrorRadius===0) {
             mirrorRadius += Math.sqrt(35/Math.PI);
             tile0.temperature += 0.025 * Math.sqrt(35/Math.PI);
@@ -88,95 +187,71 @@ function perpetualChange(){
         if (mirrorRadius+5.3/mirrorRadius > 800) {
             tile0.temperature += 0.025 * (800-mirrorRadius);
             mirrorRadius = 800;
+            dBudget -= Mirrors[1].dPrice;
+            mirrorCompleted = true;
         }
     }
 
-    //Control starting and halting of meteor S.S. construction & meteor delivery
-    if (meteorStationBuilding && meteorStationBuilding>-1 && meteorStationBuilding<240) {meteorStationBuilding++;}
-    if (meteorStationBuilding===240){
-        meteorStationCompleted = true;
+    //Asteroid S.S. construction on/off
+    if (meteorSSBuilding && meteorSSProgress<240) {meteorSSProgress++;}
+    if (meteorSSProgress===240){
+        meteorSSCompleted = true;
+        meteorSSBuilding = false;
+        dBudget -= Mirrors[0].dPrice;
+        Items[2].list.push(Meteors[1]);
     }
+
+    //Asteroid analysis on/off
     if (analyzingMeteor){
         meteorAnalysisProgress++;
         if (meteorAnalysisProgress===60){
             analyzingMeteor = false;
+            dBudget -= Meteors[1].dPrice;
             meteorAnalysisProgress = 0;
-            items[2].list.push(meteor2);
-        }
-    }
-
-    //Nuclear fallout
-    for (var i=0; i<Tiles.length; i++){
-        if (Tiles[i].fallout>0) {Tiles[i].fallout *= ( Math.pow(0.5, 1/300));} //1 frame = 1 month. Half life is 25 years.
-        //if (fallout < 1) nuclearHabitable = true;
-
-        //temperature
-        for (var j=0; j<Tiles[i].neighbors.length; j++){
-            if (Tiles[i].temperature < Tiles[i].neighbors[j].temperature){
-                Tiles[i].temperature += (Math.max(Tiles[i].temperature, Tiles[i].neighbors[j].temperature) - Math.min(Tiles[i].temperature, Tiles[i].neighbors[j].temperature))/4;
-            }
-            if (Tiles[i].temperature > Tiles[i].neighbors[j].temperature){
-                Tiles[i].neighbors[j].temperature += (Math.max(Tiles[i].temperature, Tiles[i].neighbors[j].temperature) - Math.min(Tiles[i].temperature, Tiles[i].neighbors[j].temperature))/4;
-            }
+            Items[2].list.push(Meteors[2]);
         }
     }
 }
 
-function fExplosive0(explosiveTileTarget){
-    budget += explosive0.price;
-    dBudget += explosive0.dPrice;
 
-    Tiles[explosiveTileTarget].temperature += 7; //*pow(10,-11);
-    Tiles[explosiveTileTarget].fallout += 10;
-    for (var i=0; i<Tiles[explosiveTileTarget].neighbors.length; i++){
-        Tiles[explosiveTileTarget].neighbors[i].fallout += 8;
+/**
+ *  Function controlling explosives
+ *  Note: Mars radius is 3390 km
+ */
+function fExplosive(type, target){
+    budget += Explosives[type].price;
+    dBudget += Explosives[type].dPrice;
+
+    Tiles[target].temperature += Explosives[type].tmp;
+    Tiles[target].fallout += 10;
+    for (var i=0; i<Tiles[target].neighbors.length; i++){
+        Tiles[target].neighbors[i].fallout += Explosives[type].fallout;
     }
-    Tiles[explosiveTileTarget]. altitude -= 2;
+    Tiles[target]. altitude += Explosives[type].altitude;
 }
 
-function fExplosive1(explosiveTileTarget){
-    budget += explosive1.price;
-    dBudget += explosive1.dPrice;
 
-    Tiles[explosiveTileTarget].temperature += 9; //*pow(10,-11);
-    Tiles[explosiveTileTarget].fallout += 12;
-    for (var i=0; i<Tiles[explosiveTileTarget].neighbors.length; i++){
-        Tiles[explosiveTileTarget].neighbors[i].fallout += 10;
-    }
-    Tiles[explosiveTileTarget]. altitude -= 3;
-}
-
-function fExplosive2(explosiveTileTarget){
-    budget += explosive2.price;
-    dBudget += explosive2.dPrice;
-
-    Tiles[explosiveTileTarget].temperature += 14; //*pow(10,-10);
-    Tiles[explosiveTileTarget]. altitude -= 5;
-}
-
+/**
+ *  Control the construction of the S.S. that will be used to construct mirror
+ */
 function fMirror0(){
-    budget += mirror0.price;
-
-    if (mirrorStationBuilding === false){
-        dBudget += mirror0.dPrice;
-        mirrorStationBuilding = true;
-        if (mirrorStationProgress === -1){
-            mirrorStationProgress = 0;
-        }
+    if (mirrorSSProgress === -1){
+        budget += Mirrors[0].price;
+    }
+    if (mirrorSSBuilding === false){
+        dBudget += Mirrors[0].dPrice;
+        mirrorSSBuilding = true;
     }
     else{
-        dBudget -= mirror0.dPrice;
-        mirrorStationBuilding = false;
-    }
-
-    if (mirrorStationCompleted){
-        items[1].list.push(mirror1);
+        dBudget -= Mirrors[0].dPrice;
+        mirrorSSBuilding = false;
     }
 }
 
+/**
+ *  Control the construction of the mirror
+ */
 function fMirror1(){
-    budget += mirror1.price;
-
     if (!mirrorBuilding){
         mirrorBuilding = true;
         dBudget += mirror1.dPrice;
@@ -187,54 +262,86 @@ function fMirror1(){
     }
 }
 
-function fMeteor0(){
-    budget += meteor0.price; //just 0, put it here in case we change the price later
+/**
+ *  Control the target of the mirror
+ */
+function fMirror2(target){
 
-    if (meteorStationBuilding === false){
-        dBudget += meteor0.dPrice;
-        meteorStationBuilding = true;
-        if (meteorStationProgress === -1){
-            meteorStationProgress = 0;
-        }
-    }
-    else{
-        dBudget -= meteor0.dPrice;
-        meteorStationBuilding = false;
-    }
-
-    if (meteorStationCompleted){
-        items[2].list.push(meteor1);
-    }
-}
-
-function fMeteor1(){
-    budget += meteor1.price; //just 0, put it here in case we change the price later
-
-    if (!analyzingMeteor){
-        analyzingMeteor = true;
-        dBudget += mirror1.dPrice;
-    }
-    else{
-        analyzingMeteor = false;
-        dBudget -= mirror1.dPrice;
-    }
-}
-
-function fMeteor2(meteorTileTarget){
-    budget += meteor2.price;
-    dBudget += meteor2.dPrice;
-
-    Tiles[meteorTileTarget].temperature += 10;
-    
-    var index = items[2].list.indexOf(meteor2);
-    if (index >-1) {items[2].list.splice(index,1);}
 }
 
 
 /**
+ *  Control the construction of the S.S. that will be used to analyze asteroids
+ */
+function fMeteor0(){
+    if (meteorSSProgress === -1){
+        budget += Meteors[0].price;
+    }
+    if (meteorSSBuilding === false){
+        dBudget += Meteors[0].dPrice;
+        meteorSSBuilding = true;
+    }
+    else{
+        dBudget -= Meteors[0].dPrice;
+        meteorSSBuilding = false;
+    }
+}
+
+/**
+ *  Control the analysis of asteroids
+ */
+function fMeteor1(){
+    if (!analyzingMeteor){
+        analyzingMeteor = true;
+        dBudget += Meteors[1].dPrice;
+    }
+    else{
+        analyzingMeteor = false;
+        dBudget -= Meteors[1].dPrice;
+    }
+}
+
+/**
+ *  Control target of the meteor
+ */
+function fMeteor2(target){
+    budget += meteor2.price;
+    dBudget += meteor2.dPrice;
+
+    Tiles[target].temperature += 10;
+
+    Items[2].list.pop();
+}
+
+/**
+ * Turn pyrolysis of a tile on or off
+ */
+function fPyrolysis(target) {
+    if (!Tiles[target].pyrolyzing){
+        dBudget += Pyrolysis[0].dPrice;
+        Tiles[target].pyrolyzing = true;
+    }
+    else{
+        dBudget -= Pyrolysis[0].dPrice;
+        Tiles[target].pyrolyzing = false;
+    }
+}
+
+function fLife (type, target){
+    switch (type){
+        case 0:{
+            Tiles[target].moss = 1;
+        }
+        case 1:{
+            Tiles[target].plants = 1;
+        }
+    }
+
+}
+
+/**
  * Test functions
  */
-
 function mouseClicked(){
     perpetualChange();
     if (mouseOverExplosive0){explosive0(0);}

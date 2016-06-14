@@ -124,7 +124,8 @@ function perpetualChange(){
         }
 
         //Water access
-        if (Tiles[i].farNeighbors.water) {Tiles[i].waterAccess = true}
+        if (Tiles[i].farNeighbors.water || Tiles[i].neighbors.water) {Tiles[i].waterAccess = true;}
+        //if (Tile[i].hasWater(1) || Tile[i].hasWater(2){ Tiles[i].waterAccess = true; }
 
         //Oxygen spread (between 2 neighbors, tile with higher O2 concentration gives to tile with lower)
         for (var j=0; j<Tiles[i].neighbors.length; j++){
@@ -150,13 +151,30 @@ function perpetualChange(){
         }
 
         //Life force, increase if tile is habitable, capped at 50, and decreases if tile is inhabitable
-        if (Tiles[i].habitable){
-            if (Tiles[i].lifeForce < 50) {Tiles[i].lifeForce += Tiles[i].moss * Lives[0].growth + Tiles[i].plants * Lives[1].growth;}
-            if (Tiles[i].lifeForce > 50) {Tiles[i].lifeForce = 50;}
+        switch (Tiles[i].habitable){
+            case 0:{
+                if (Tiles[i].lifeForce < 50) {Tiles[i].lifeForce += Tiles[i].moss * Lives[0].growth;}
+                if (Tiles[i].lifeForce > 50) {Tiles[i].lifeForce = 50;}
+                break;
+            }
+            case 1:{
+                if (Tiles[i].lifeForce < 50) {Tiles[i].lifeForce += Tiles[i].moss * Lives[0].growth + Tiles[i].plants * Lives[1].growth;}
+                if (Tiles[i].lifeForce > 50) {Tiles[i].lifeForce = 50;}
+                break;
+            }
+            case 2:{
+                if (Tiles[i].lifeForce < 50) {Tiles[i].lifeForce += Tiles[i].moss * Lives[0].growth + Tiles[i].plants * Lives[1].growth;}
+                if (Tiles[i].lifeForce > 50) {Tiles[i].lifeForce = 50;}
+                break;
+            }
+            default:{
+                Tiles[i].lifeForce -= 10;
+                break;
+            }
         }
-        else{
-            Tiles[i].lifeForce -= 10;
-        }
+
+
+
 
         //Oxygen production by pyrolysis and plants
         if (Tiles[i].pyrolyzing){

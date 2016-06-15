@@ -349,9 +349,11 @@ function fLife (type, target){
     switch (type){
         case 0:{
             Tiles[target].moss = 1;
+            break;
         }
         case 1:{
             Tiles[target].plants = 1;
+            break;
         }
     }
 

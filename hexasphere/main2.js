@@ -5,10 +5,18 @@
 // Scene variables
 var camera, controls, scene, renderer;
 
+// Loading variables
+var loader;
+var numLoads = 2;
+
+// Tree storing variables
+var treeMesh = [];
+
 // Image projection variables
 var img, projectionContext, projectionCanvas;
 var heightMap,heightContext, heightCanvas;
 var pixelData, heightData;
+
 
 // Hexasphere variable
 var hexasphere;
@@ -205,6 +213,7 @@ function reshapeTile(tile) {
         averageHeight = (tile.height + height1 + height2) / 3;
         scalePoint(tile.boundary[i], Math.pow(averageHeight / BASE_HEIGHT, 5));
     }
+    scalePoint(tile.centerPoint, Math.pow(averageHeight / BASE_HEIGHT, 5));
 }
 
 /**
@@ -284,7 +293,7 @@ function determineRender() {
 
 function onMouseUp(e) {
     burn(selectedID);
-    console.log("Click");
+    console.log("Click ", selectedID);
 }
 
 function onMouseMove( event ) {
@@ -301,10 +310,63 @@ function onMouseMove( event ) {
 // Three.js code
 ////////////////////
 
-init();
-animate();
+getResources();
+
+function getResources() {
+    loadTreeChunk();
+    loadTreeLeaves();
+}
+
+/* Load the chunk */
+function loadTreeChunk() {
+    var loader = new THREE.JSONLoader();
+
+    // load the tree trunk
+    loader.load(
+        // resource URL
+        '../assets/treetrunk.json',
+        // Function when resource is loaded
+        function ( geometry, materials ) {
+            var material = new THREE.MeshBasicMaterial({side: THREE.DoubleSide, color: 0x7F4F2B});
+            object = new THREE.Mesh( geometry, material );
+            treeMesh.push(object.clone());
+            numLoads -= 1;
+        }
+    );
+}
+
+/* Load the leaves */
+function loadTreeLeaves() {
+    var loader = new THREE.JSONLoader();
+
+    // load the tree leaves
+    loader.load(
+        // resource URL
+        '../assets/treeleaves.json',
+        // Function when resource is loaded
+        function ( geometry, materials ) {
+            var material = new THREE.MeshBasicMaterial({side: THREE.DoubleSide, color: 0x277F4B});
+            object = new THREE.Mesh( geometry, material );
+            treeMesh.push(object.clone());
+            checkLoads();
+        }
+    );
+}
+
+/**
+ * If everything is loaded, start executing the application
+ */
+function checkLoads() {
+    numLoads -= 1;
+    if (numLoads == 0) {
+        init();
+        animate();
+    }
+}
 
 function init(){
+
+    console.log("RUN");
 
     /***************
      * Renderer code
@@ -346,6 +408,7 @@ function init(){
     /***************
      * Object code
      ***************/
+    console.log(treeMesh);
 
     // Projection code
     img = document.getElementById("projection");
@@ -410,12 +473,10 @@ function init(){
 
         if (dir < 0) {
             // Create the material with THREE.BackSide
-            var material = new THREE.MeshBasicMaterial({side: THREE.BackSide, color: t.color});
+            var material = new THREE.MeshBasicMaterial({side: THREE.DoubleSide, color: t.color});
         } else {
-            var material = new THREE.MeshBasicMaterial({side: THREE.FrontSide, color: t.color});
+            var material = new THREE.MeshBasicMaterial({side: THREE.DoubleSide, color: t.color});
         }
-
-
 
         // Create the tile and add it to the scene.
         var tilemesh = new THREE.Mesh(geometry, material);
@@ -435,12 +496,73 @@ function init(){
 
     };
 
+    // Add the tree and water
+    for (var i = 0; i < hexasphere.tiles.length; i++) {
+        var t = hexasphere.tiles[i];
+        if (t.height < 33.5) {
+            t.water = true;
+        }
+
+        if (t.height > 34.5) {
+            t.plant = true;
+        }
+    }
+
+    // Add the tree
+    var tile1 = hexasphere.tiles[3];
+    var loader = new THREE.JSONLoader();
+    var treeMesh = [];
+    var object;
+    var focalPoint = new THREE.Vector3(tile1.centerPoint.x, tile1.centerPoint.y, tile1.centerPoint.z);
+
+    // load the tree trunk
+    loader.load(
+        // resource URL
+        '../assets/treetrunk.json',
+        // Function when resource is loaded
+        function ( geometry, materials ) {
+            var material = new THREE.MeshBasicMaterial({side: THREE.DoubleSide, color: 0x7F4F2B});
+            object = new THREE.Mesh( geometry, material );
+            object.translateX(tile1.centerPoint.x);
+            object.translateY(tile1.centerPoint.y);
+            object.translateZ(tile1.centerPoint.z);
+            object.scale.set( TREE_BASE_SCALE, TREE_BASE_SCALE, TREE_BASE_SCALE );
+
+            var axis = new THREE.Vector3(0, 1, 0);
+            object.quaternion.setFromUnitVectors(axis, focalPoint.clone().normalize());
+            //object.lookAt(focalPoint);
+
+            treeMesh.push(object);
+            scene.add( object );
+        }
+    );
+
+    // load the tree trunk
+
+    loader.load(
+        // resource URL
+        '../assets/treeleaves.json',
+        // Function when resource is loaded
+        function ( geometry, materials ) {
+            var material = new THREE.MeshBasicMaterial({side: THREE.DoubleSide, color: 0x277F4B});
+            object = new THREE.Mesh( geometry, material );
+            object.translateX(tile1.centerPoint.x);
+            object.translateY(tile1.centerPoint.y);
+            object.translateZ(tile1.centerPoint.z);
+            object.scale.set( TREE_BASE_SCALE, TREE_BASE_SCALE, TREE_BASE_SCALE );
+
+            var axis = new THREE.Vector3(0, 1, 0);
+            object.quaternion.setFromUnitVectors(axis, focalPoint.clone().normalize());
+
+            treeMesh.push(object);
+            scene.add( object );
+        }
+    );
+
     // Set up temporaries variables
     lastID = 0;
     lastTile = hexasphere.tiles[0];
     lastMesh = meshSphere[0];
-
-    //showTileIndex()
 
     // Render the first frame
     render();
@@ -468,7 +590,7 @@ function animate(){
 
     if (intersects.length > 0) {
         // Take the id of the first intersected object
-        selectedID = intersects[0].object.id-3;
+        selectedID = intersects[0].object.id-7;
         selectedTile = hexasphere.tiles[selectedID];
 
         // Change color if it's a different tile

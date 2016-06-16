@@ -3987,7 +3987,7 @@ var unicodeRanges = [
     {begin: 0x10190, end: 0x101CF}, // Ancient Symbols
     {begin: 0x101D0, end: 0x101FF}, // Phaistos Disc
     {begin: 0x102A0, end: 0x102DF}, // Carian
-    {begin: 0x1F030, end: 0x1F09F}  // Domino Tiles
+    {begin: 0x1F030, end: 0x1F09F}  // Domino tiles_list
 ];
 
 function getUnicodeRange(unicode) {

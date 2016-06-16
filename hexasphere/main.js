@@ -3,12 +3,13 @@ $(window).load(function() {
     var camera, controls, scene, renderer;
 
     // Hex variable
-    var hexasphere = new Hexasphere(30, 60, 0.9);
+    var hexasphere = new Hexasphere(30, 5,.4);
     var width = $(window).innerWidth();
     var height = $(window).innerHeight() - 10;
 
     // Renderer code
     var renderer = new THREE.WebGLRenderer({antialias: true});
+    renderer.setClearColor( 0xffffff, 1 );
     renderer.setSize(width, height);
 
     // Camera code
@@ -19,7 +20,7 @@ $(window).load(function() {
     // Scene and fog code
     var scene = new THREE.Scene();
 
-    scene.fog = new THREE.Fog(0x000000, cameraDistance * .4, cameraDistance * 1.2);
+    //scene.fog = new THREE.Fog(0x000000, cameraDistance * .4, cameraDistance * 1.2);
 
     // Projection code
     var img = document.getElementById("projection");
@@ -131,6 +132,55 @@ $(window).load(function() {
 
     }
 
+    // Add the tree
+    // instantiate a loader
+    // instantiate a loader
+    // Make treeMesh looking at Tile 1
+    var tile1 = hexasphere.tiles[3];
+    var loader = new THREE.JSONLoader();
+    var treeMesh = [];
+    var object;
+    var focalPoint = new THREE.Vector3(tile1.centerPoint.x, tile1.centerPoint.y, tile1.centerPoint.z);
+
+    // load the tree trunk
+    loader.load(
+        // resource URL
+        '../assets/treetrunk.json',
+        // Function when resource is loaded
+        function ( geometry, materials ) {
+            var material = new THREE.MeshBasicMaterial({side: THREE.DoubleSide, color: 0x7F4F2B});
+            object = new THREE.Mesh( geometry, material );
+            object.lookAt(focalPoint);
+            //object.up = new THREE.Vector3(0,0,1);
+            object.translateX(tile1.centerPoint.x);
+            object.translateY(tile1.centerPoint.Y);
+            object.translateZ(tile1.centerPoint.Z);
+            treeMesh.push(object);
+            scene.add( object );
+        }
+    );
+
+    // load the tree trunk
+    loader.load(
+        // resource URL
+        '../assets/treeleaves.json',
+        // Function when resource is loaded
+        function ( geometry, materials ) {
+            var material = new THREE.MeshBasicMaterial({side: THREE.DoubleSide, color: 0x277F4B});
+            object = new THREE.Mesh( geometry, material );
+            object.up = new THREE.Vector3(0,0,1);
+            object.lookAt(focalPoint);
+            object.translateX(tile1.centerPoint.x);
+            object.translateY(tile1.centerPoint.Y);
+            object.translateZ(tile1.centerPoint.Z);
+            treeMesh.push(object);
+            scene.add( object );
+        }
+    );
+
+    console.log(treeMesh);
+
+    // Rotate the thing
     var startTime = Date.now();
     var lastTime = Date.now();
     var cameraAngle = 0;

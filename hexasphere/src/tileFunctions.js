@@ -94,7 +94,7 @@ tile0.neighbors.push(tile1, tile2);
 tile1.neighbors.push(tile0, tile2, tile3);
 tile2.neighbors.push(tile0, tile1, tile3);
 tile3.neighbors.push(tile1, tile2);
-Tiles.push(tile0, tile1, tile2, tile3);
+tiles_list.push(tile0, tile1, tile2, tile3);
 
 function perpetualChange(){
     budget += dBudget;
@@ -134,15 +134,15 @@ function perpetualChange(){
     }
 
     //Nuclear fallout
-    for (var i=0; i<Tiles.length; i++){
-        if (Tiles[i].fallout>0) {Tiles[i].fallout--;}
+    for (var i=0; i<tiles_list.length; i++){
+        if (tiles_list[i].fallout>0) {tiles_list[i].fallout--;}
 
-        for (var j=0; j<Tiles[i].neighbors.length; j++){
-            if (Tiles[i].temperature < Tiles[i].neighbors[j].temperature){
-                Tiles[i].temperature += (Math.max(Tiles[i].temperature, Tiles[i].neighbors[j].temperature) - Math.min(Tiles[i].temperature, Tiles[i].neighbors[j].temperature))/4;
+        for (var j=0; j<tiles_list[i].neighbors.length; j++){
+            if (tiles_list[i].temperature < tiles_list[i].neighbors[j].temperature){
+                tiles_list[i].temperature += (Math.max(tiles_list[i].temperature, tiles_list[i].neighbors[j].temperature) - Math.min(tiles_list[i].temperature, tiles_list[i].neighbors[j].temperature))/4;
             }
-            if (Tiles[i].temperature > Tiles[i].neighbors[j].temperature){
-                Tiles[i].neighbors[j].temperature += (Math.max(Tiles[i].temperature, Tiles[i].neighbors[j].temperature) - Math.min(Tiles[i].temperature, Tiles[i].neighbors[j].temperature))/4;
+            if (tiles_list[i].temperature > tiles_list[i].neighbors[j].temperature){
+                tiles_list[i].neighbors[j].temperature += (Math.max(tiles_list[i].temperature, tiles_list[i].neighbors[j].temperature) - Math.min(tiles_list[i].temperature, tiles_list[i].neighbors[j].temperature))/4;
             }
         }
     }
@@ -157,12 +157,12 @@ function fExplosive0_bomb1(explosiveTileTarget){
     budget += explosive0.price;
     dBudget += explosive0.dPrice;
 
-    Tiles[explosiveTileTarget].temperature += 7; //*pow(10,-11);
-    Tiles[explosiveTileTarget].fallout += 10;
-    for (var i=0; i<Tiles[explosiveTileTarget].neighbors.length; i++){
-        Tiles[explosiveTileTarget].neighbors[i].fallout += 8;
+    tiles_list[explosiveTileTarget].temperature += 7; //*pow(10,-11);
+    tiles_list[explosiveTileTarget].fallout += 10;
+    for (var i=0; i<tiles_list[explosiveTileTarget].neighbors.length; i++){
+        tiles_list[explosiveTileTarget].neighbors[i].fallout += 8;
     }
-    Tiles[explosiveTileTarget].altitude -= 2;
+    tiles_list[explosiveTileTarget].altitude -= 2;
 }
 
 
@@ -171,12 +171,12 @@ function fExplosive0(explosiveTileTarget){
     budget += explosive0.price;
     dBudget += explosive0.dPrice;
 
-    Tiles[explosiveTileTarget].temperature += 7; //*pow(10,-11);
-    Tiles[explosiveTileTarget].fallout += 10;
-    for (var i=0; i<Tiles[explosiveTileTarget].neighbors.length; i++){
-        Tiles[explosiveTileTarget].neighbors[i].fallout += 8;
+    tiles_list[explosiveTileTarget].temperature += 7; //*pow(10,-11);
+    tiles_list[explosiveTileTarget].fallout += 10;
+    for (var i=0; i<tiles_list[explosiveTileTarget].neighbors.length; i++){
+        tiles_list[explosiveTileTarget].neighbors[i].fallout += 8;
     }
-    Tiles[explosiveTileTarget]. altitude -= 2;
+    tiles_list[explosiveTileTarget]. altitude -= 2;
 }
 
 
@@ -185,20 +185,20 @@ function fExplosive1(explosiveTileTarget){
     budget += explosive1.price;
     dBudget += explosive1.dPrice;
 
-    Tiles[explosiveTileTarget].temperature += 9; //*pow(10,-11);
-    Tiles[explosiveTileTarget].fallout += 12;
-    for (var i=0; i<Tiles[explosiveTileTarget].neighbors.length; i++){
-        Tiles[explosiveTileTarget].neighbors[i].fallout += 10;
+    tiles_list[explosiveTileTarget].temperature += 9; //*pow(10,-11);
+    tiles_list[explosiveTileTarget].fallout += 12;
+    for (var i=0; i<tiles_list[explosiveTileTarget].neighbors.length; i++){
+        tiles_list[explosiveTileTarget].neighbors[i].fallout += 10;
     }
-    Tiles[explosiveTileTarget]. altitude -= 3;
+    tiles_list[explosiveTileTarget]. altitude -= 3;
 }
 
 function fExplosive2(explosiveTileTarget){
     budget += explosive2.price;
     dBudget += explosive2.dPrice;
 
-    Tiles[explosiveTileTarget].temperature += 14; //*pow(10,-10);
-    Tiles[explosiveTileTarget]. altitude -= 5;
+    tiles_list[explosiveTileTarget].temperature += 14; //*pow(10,-10);
+    tiles_list[explosiveTileTarget]. altitude -= 5;
 }
 
 function fMirror0(){
@@ -271,7 +271,7 @@ function fMeteor2(meteorTileTarget){
     budget += meteor2.price;
     dBudget += meteor2.dPrice;
 
-    Tiles[meteorTileTarget].temperature += 10;
+    tiles_list[meteorTileTarget].temperature += 10;
     
     var index = items[2].list.indexOf(meteor2);
     if (index >-1) {items[2].list.splice(index,1);}
@@ -287,8 +287,8 @@ function mouseClicked(){
     if (mouseOverExplosive1){explosive1(0);}
     if (mouseOverExplosive2){explosive2(0);}
 
-    for (var i=0; i<Tiles.length; i++){
-        console.log("Tile: " + i + "\nTemp: " + Tiles[i].temperature.toFixed(2) + "\nAltitude: " + Tiles[i].altitude + "\nFallout: " + Tiles[i].fallout);
+    for (var i=0; i<tiles_list.length; i++){
+        console.log("Tile: " + i + "\nTemp: " + tiles_list[i].temperature.toFixed(2) + "\nAltitude: " + tiles_list[i].altitude + "\nFallout: " + tiles_list[i].fallout);
     }
 }
 

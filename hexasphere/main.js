@@ -145,7 +145,7 @@ $(window).load(function() {
     // load the tree trunk
     loader.load(
         // resource URL
-        '../assets/treetrunk.json',
+        '../assets/treetrunk.js',
         // Function when resource is loaded
         function ( geometry, materials ) {
             var material = new THREE.MeshBasicMaterial({side: THREE.DoubleSide, color: 0x7F4F2B});
@@ -163,7 +163,7 @@ $(window).load(function() {
     // load the tree trunk
     loader.load(
         // resource URL
-        '../assets/treeleaves.json',
+        '../assets/treeleaves.js',
         // Function when resource is loaded
         function ( geometry, materials ) {
             var material = new THREE.MeshBasicMaterial({side: THREE.DoubleSide, color: 0x277F4B});

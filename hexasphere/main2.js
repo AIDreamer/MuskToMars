@@ -5,18 +5,14 @@
 // Scene variables
 var camera, controls, scene, renderer;
 
-// Loading variables
-var loader;
-var numLoads = 2;
-
 // Tree storing variables
-var treeMesh = [];
+var tree_loader;
+var tree_mesh = [];
 
 // Image projection variables
 var img, projectionContext, projectionCanvas;
 var heightMap,heightContext, heightCanvas;
 var pixelData, heightData;
-
 
 // Hexasphere variable
 var hexasphere;
@@ -168,7 +164,7 @@ function makeTextSprite( message, parameters )
     context.fillText( message, borderThickness, fontsize + borderThickness);
 
     // Create texture based on canvas
-    var texture = new THREE.Texture(canvas)
+    var texture = new THREE.Texture(canvas);
     texture.needsUpdate = true;
 
     // Create the sprite based on the texture
@@ -310,68 +306,15 @@ function onMouseMove( event ) {
 // Three.js code
 ////////////////////
 
-getResources();
+init();
+animate();
 
-function getResources() {
-    loadTreeChunk();
-    loadTreeLeaves();
-}
-
-/* Load the chunk */
-function loadTreeChunk() {
-    var loader = new THREE.JSONLoader();
-
-    // load the tree trunk
-    loader.load(
-        // resource URL
-        '../assets/treetrunk.json',
-        // Function when resource is loaded
-        function ( geometry, materials ) {
-            var material = new THREE.MeshBasicMaterial({side: THREE.DoubleSide, color: 0x7F4F2B});
-            object = new THREE.Mesh( geometry, material );
-            treeMesh.push(object.clone());
-            numLoads -= 1;
-        }
-    );
-}
-
-/* Load the leaves */
-function loadTreeLeaves() {
-    var loader = new THREE.JSONLoader();
-
-    // load the tree leaves
-    loader.load(
-        // resource URL
-        '../assets/treeleaves.json',
-        // Function when resource is loaded
-        function ( geometry, materials ) {
-            var material = new THREE.MeshBasicMaterial({side: THREE.DoubleSide, color: 0x277F4B});
-            object = new THREE.Mesh( geometry, material );
-            treeMesh.push(object.clone());
-            checkLoads();
-        }
-    );
-}
-
-/**
- * If everything is loaded, start executing the application
- */
-function checkLoads() {
-    numLoads -= 1;
-    if (numLoads == 0) {
-        init();
-        animate();
-    }
-}
-
-function init(){
-
-    console.log("RUN");
+/** Initialize stuffs */
+function init() {
 
     /***************
      * Renderer code
      ***************/
-
     var width = window.innerWidth;
     var height = window.innerHeight - 10;
 
@@ -408,7 +351,17 @@ function init(){
     /***************
      * Object code
      ***************/
-    console.log(treeMesh);
+    // Tree code
+    tree_loader = new THREE.JSONLoader();
+    var model = tree_loader.parse(treechunk);
+    var material = new THREE.MeshBasicMaterial({side: THREE.DoubleSide, color: 0x7F4F2B});
+    var mesh = new THREE.Mesh( model.geometry, material );
+    tree_mesh.push(mesh);
+
+    model = tree_loader.parse(treeleaves);
+    material = new THREE.MeshBasicMaterial({side: THREE.DoubleSide, color: LEAF_COLOR});
+    var mesh = new THREE.Mesh( model.geometry, material );
+    tree_mesh.push(mesh);
 
     // Projection code
     img = document.getElementById("projection");
@@ -499,13 +452,44 @@ function init(){
     // Add the tree and water
     for (var i = 0; i < hexasphere.tiles.length; i++) {
         var t = hexasphere.tiles[i];
-        if (t.height < 33.5) {
+        if (t.height < WATER_BASE) {
             t.water = true;
         }
-
-        if (t.height > 34.5) {
+        if (t.height > TREE_BASE) {
             t.plant = true;
         }
+    }
+
+    // Construct tree models
+    for (var i = 0; i < hexasphere.tiles.length; i++) {
+        var t = hexasphere.tiles[i];
+        var focalPoint = new THREE.Vector3(t.centerPoint.x, t.centerPoint.y, t.centerPoint.z);
+        var scaleX = TREE_BASE_SCALE + Math.random() * TREE_WIDTH_SCALE_RANGE;
+        var scaleY = TREE_BASE_SCALE + Math.random() * TREE_HEIGHT_SCALE_RANGE;
+        var scaleZ = TREE_BASE_SCALE + Math.random() * TREE_WIDTH_SCALE_RANGE;
+        if (t.plant == true) {
+            object = tree_mesh[0].clone();
+            object.translateX(t.centerPoint.x);
+            object.translateY(t.centerPoint.y);
+            object.translateZ(t.centerPoint.z);
+            object.scale.set(scaleX, scaleY, scaleZ);
+
+            var axis = new THREE.Vector3(0, 1, 0);
+            object.quaternion.setFromUnitVectors(axis, focalPoint.clone().normalize());
+
+            scene.add(object);
+
+            object = tree_mesh[1].clone();
+            object.translateX(t.centerPoint.x);
+            object.translateY(t.centerPoint.y);
+            object.translateZ(t.centerPoint.z);
+            object.scale.set(scaleX, scaleY, scaleZ);
+
+            var axis = new THREE.Vector3(0, 1, 0);
+            object.quaternion.setFromUnitVectors(axis, focalPoint.clone().normalize());
+
+            scene.add(object);
+        };
     }
 
     // Add the tree
@@ -515,50 +499,6 @@ function init(){
     var object;
     var focalPoint = new THREE.Vector3(tile1.centerPoint.x, tile1.centerPoint.y, tile1.centerPoint.z);
 
-    // load the tree trunk
-    loader.load(
-        // resource URL
-        '../assets/treetrunk.json',
-        // Function when resource is loaded
-        function ( geometry, materials ) {
-            var material = new THREE.MeshBasicMaterial({side: THREE.DoubleSide, color: 0x7F4F2B});
-            object = new THREE.Mesh( geometry, material );
-            object.translateX(tile1.centerPoint.x);
-            object.translateY(tile1.centerPoint.y);
-            object.translateZ(tile1.centerPoint.z);
-            object.scale.set( TREE_BASE_SCALE, TREE_BASE_SCALE, TREE_BASE_SCALE );
-
-            var axis = new THREE.Vector3(0, 1, 0);
-            object.quaternion.setFromUnitVectors(axis, focalPoint.clone().normalize());
-            //object.lookAt(focalPoint);
-
-            treeMesh.push(object);
-            scene.add( object );
-        }
-    );
-
-    // load the tree trunk
-
-    loader.load(
-        // resource URL
-        '../assets/treeleaves.json',
-        // Function when resource is loaded
-        function ( geometry, materials ) {
-            var material = new THREE.MeshBasicMaterial({side: THREE.DoubleSide, color: 0x277F4B});
-            object = new THREE.Mesh( geometry, material );
-            object.translateX(tile1.centerPoint.x);
-            object.translateY(tile1.centerPoint.y);
-            object.translateZ(tile1.centerPoint.z);
-            object.scale.set( TREE_BASE_SCALE, TREE_BASE_SCALE, TREE_BASE_SCALE );
-
-            var axis = new THREE.Vector3(0, 1, 0);
-            object.quaternion.setFromUnitVectors(axis, focalPoint.clone().normalize());
-
-            treeMesh.push(object);
-            scene.add( object );
-        }
-    );
-
     // Set up temporaries variables
     lastID = 0;
     lastTile = hexasphere.tiles[0];
@@ -566,8 +506,6 @@ function init(){
 
     // Render the first frame
     render();
-
-
 }
 
 /**
@@ -590,7 +528,7 @@ function animate(){
 
     if (intersects.length > 0) {
         // Take the id of the first intersected object
-        selectedID = intersects[0].object.id-7;
+        selectedID = intersects[0].object.id-5;
         selectedTile = hexasphere.tiles[selectedID];
 
         // Change color if it's a different tile
@@ -642,4 +580,3 @@ function render() {
 
 window.addEventListener( 'mousemove', onMouseMove, false );
 window.addEventListener( 'mouseup', onMouseUp, true );
-window.requestAnimationFrame(render);

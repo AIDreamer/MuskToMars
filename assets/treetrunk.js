@@ -1,4 +1,4 @@
-{
+var treechunk = {
 
     "metadata" :
     {

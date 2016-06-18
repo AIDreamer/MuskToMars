@@ -23,6 +23,7 @@ var Tile = function(centerPoint, hexSize){
 
     // Game property
     this.water = false;
+    this.plant = false;
     this.altitude = 100;
     this.earthDensity = 0;
     this.temperature = BASE_MEAN_TEMPERATURE;
@@ -62,9 +63,12 @@ Tile.prototype.scaledBoundary = function(scale){
  * Calculate the color based on the existing property.
  */
 Tile.prototype.calculateColor = function() {
-    var fallOutRatio = Math.min(.8, this.fallout / MAX_FALLOUT);
-    var baseColorRatio = 1 - fallOutRatio;
-    this.color = calculateColorByRatio([FALL_OUT_COLOR, this.baseColor], [fallOutRatio,baseColorRatio]);
+    var fallOutInfluence = this.fallout / MAX_FALLOUT * FALL_OUT_COEFFICIENT;
+    var waterInfluence;
+    if (this.water == false) waterInfluence = 0;
+    else waterInfluence = Math.max((WATER_BASE - this.height) / WATER_RANGE, 0) * WATER_COEFFICIENT;
+    var baseColorInfluence = BASE_COEFFICIENT;
+    this.color = calculateColorByRatio([FALL_OUT_COLOR, WATER_COLOR, this.baseColor], [fallOutInfluence, waterInfluence, baseColorInfluence]);
 };
 
 /**
@@ -85,13 +89,28 @@ Tile.prototype.toString = function(){
  * @param ratios
  * @returns {THREE.Color}
  */
-function calculateColorByRatio(colors, ratios) {
+function calculateColorByRatio(colors, influences) {
+    var sum = influences.reduce(add, 0);
+    for (var i = 0; i < influences.length; i++) {
+        influences[i] /= sum;
+    }
+
     var r = 0, g = 0, b = 0;
     for (var i = 0; i < colors.length; i++) {
-        r += colors[i].r * ratios[i];
-        g += colors[i].g * ratios[i];
-        b += colors[i].b * ratios[i];
+        r += colors[i].r * influences[i];
+        g += colors[i].g * influences[i];
+        b += colors[i].b * influences[i];
     }
     //console.log(colors);
     return new THREE.Color(r,g,b);
+}
+
+/**
+ * add utility functions
+ * @param a
+ * @param b
+ * @returns {*}
+ */
+function add(a, b) {
+    return a + b;
 }

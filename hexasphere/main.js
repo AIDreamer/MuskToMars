@@ -1,5 +1,7 @@
 $(window).load(function() {
 
+
+
     var camera, controls, scene, renderer;
 
     // Hex variable
@@ -177,6 +179,36 @@ $(window).load(function() {
             scene.add( object );
         }
     );
+
+    function addLight( h, s, l, x, y, z, intensity ) {
+
+        var light = new THREE.PointLight( 0xffffff, intensity, 2000 );
+        light.color.setHSL( h, s, l );
+        light.position.set( x, y, z );
+        scene.add( light );
+
+        var flareColor = new THREE.Color( 0xffffff );
+        flareColor.setHSL( h, s, l + 0.5 );
+
+        var lensFlare = new THREE.LensFlare( flare1, 700, 0.0, THREE.AdditiveBlending, flareColor );
+
+        lensFlare.add( flare2, 512, 0.0, THREE.AdditiveBlending );
+        lensFlare.add( flare2, 512, 0.0, THREE.AdditiveBlending );
+        lensFlare.add( flare2, 512, 0.0, THREE.AdditiveBlending );
+
+        lensFlare.add( flare3, 60, 0.6, THREE.AdditiveBlending );
+        lensFlare.add( flare3, 70, 0.7, THREE.AdditiveBlending );
+        lensFlare.add( flare3, 120, 0.9, THREE.AdditiveBlending );
+        lensFlare.add( flare3, 70, 1.0, THREE.AdditiveBlending );
+
+        lensFlare.position.set( x, y, z );
+
+        scene.add( lensFlare );
+
+    }
+
+    addLight( 0.55, 0.9, 0.5, 0, 0, 100, 1.2 );
+    addLight( 0.08, 0.5, 0.5, 0, 0, -1000, 2 );
 
     console.log(treeMesh);
 

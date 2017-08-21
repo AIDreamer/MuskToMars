@@ -93,7 +93,6 @@ var Hexasphere = function(radius, numDivisions, hexSize){
 
     // Tile
     this.tiles = [];
-
     for(var p in points){
         this.tiles.push(new Tile(points[p], hexSize));
     }

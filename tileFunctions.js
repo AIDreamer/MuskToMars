@@ -8,7 +8,7 @@
 //Check altitude commands in final version
 
 /**
- * Items vars & lists
+ * ITEMS vars & lists
  */
 var Explosives = [
     {name:"Nuclear Fission Bomb", img: "Image var", price: 210000000, dPrice: 0, effect:true, tmp: 7*Math.pow(10,-11), fallout:8, altitude: -0.2 },
@@ -34,10 +34,10 @@ var Lives = [
 ];
 
 var Items = [
-    {name: "Explosives", list: [], mouseIsOver:false, mousePressedOver:false, mouseIsOverList:[], mousePressedOverList:[]},
+    {name: "EXPLOSIVES", list: [], mouseIsOver:false, mousePressedOver:false, mouseIsOverList:[], mousePressedOverList:[]},
     {name: "Orbital Mirror", list: [], mouseIsOver:false, mousePressedOver:false, mouseIsOverList:[], mousePressedOverList:[]},
     {name: "Meteor", list: [], mouseIsOver:false, mousePressedOver:false, mouseIsOverList:[], mousePressedOverList:[]},
-    {name: "Pyrolysis", list: [], mouseIsOver:false, mousePressedOver:false, mouseIsOverList:[], mousePressedOverList:[]},
+    {name: "PYROLYSIS", list: [], mouseIsOver:false, mousePressedOver:false, mouseIsOverList:[], mousePressedOverList:[]},
     {name: "Life", list: [], mouseIsOver:false, mousePressedOver:false, mouseIsOverList:[], mousePressedOverList:[]}
 ];
 
@@ -73,7 +73,7 @@ var analyzingMeteor = false;
 var meteorAnalysisProgress = 0;
 
 /**
- * Tiles_list, which will be assigned to actual tiles_list
+ * Tiles_list, which will be assigned to actual tileList
  * Units: altitude: km,
  * lifeforce: arbitrary;
  * atmP: bar;
@@ -81,7 +81,7 @@ var meteorAnalysisProgress = 0;
  * fallout: arbitrary, but decay remains true to half-life cycle and approximate time;
  * temperature: Kelvin.
  */
-var tiles_list;
+var tileList;
 
 /**
  * Effects before each turn
@@ -95,74 +95,74 @@ function perpetualChange(){
     /**
      * Keep track of tile variable
      */
-    for (var i=0; i<tiles_list.length; i++){
+    for (var i=0; i<tileList.length; i++){
         //Nuclear fallout
-        if (tiles_list[i].fallout>0) {tiles_list[i].fallout *= ( Math.pow(0.5, 1/300));} //1 frame = 1 month. Half life is 25 years.
+        if (tileList[i].fallout>0) {tileList[i].fallout *= ( Math.pow(0.5, 1/300));} //1 frame = 1 month. Half life is 25 years.
 
         //Temperature spread (between 2 neighbors, warmer tile gives temperature to cooler tile)
-        for (var j=0; j<tiles_list[i].neighbors.length; j++){
-            if (tiles_list[i].temperature < tiles_list[i].neighbors[j].temperature){
-                tiles_list[i].temperature += (Math.max(tiles_list[i].temperature, tiles_list[i].neighbors[j].temperature) - Math.min(tiles_list[i].temperature, tiles_list[i].neighbors[j].temperature))/4;
-                tiles_list[i].neighbors[j].temperature -= (Math.max(tiles_list[i].temperature, tiles_list[i].neighbors[j].temperature) - Math.min(tiles_list[i].temperature, tiles_list[i].neighbors[j].temperature))/4;
+        for (var j=0; j<tileList[i].neighbors.length; j++){
+            if (tileList[i].temperature < tileList[i].neighbors[j].temperature){
+                tileList[i].temperature += (Math.max(tileList[i].temperature, tileList[i].neighbors[j].temperature) - Math.min(tileList[i].temperature, tileList[i].neighbors[j].temperature))/4;
+                tileList[i].neighbors[j].temperature -= (Math.max(tileList[i].temperature, tileList[i].neighbors[j].temperature) - Math.min(tileList[i].temperature, tileList[i].neighbors[j].temperature))/4;
             }
-            else if (tiles_list[i].temperature > tiles_list[i].neighbors[j].temperature){
-                tiles_list[i].temperature -= (Math.max(tiles_list[i].temperature, tiles_list[i].neighbors[j].temperature) - Math.min(tiles_list[i].temperature, tiles_list[i].neighbors[j].temperature))/4;
-                tiles_list[i].neighbors[j].temperature += (Math.max(tiles_list[i].temperature, tiles_list[i].neighbors[j].temperature) - Math.min(tiles_list[i].temperature, tiles_list[i].neighbors[j].temperature))/4;
+            else if (tileList[i].temperature > tileList[i].neighbors[j].temperature){
+                tileList[i].temperature -= (Math.max(tileList[i].temperature, tileList[i].neighbors[j].temperature) - Math.min(tileList[i].temperature, tileList[i].neighbors[j].temperature))/4;
+                tileList[i].neighbors[j].temperature += (Math.max(tileList[i].temperature, tileList[i].neighbors[j].temperature) - Math.min(tileList[i].temperature, tileList[i].neighbors[j].temperature))/4;
             }
         }
 
         //Water
-        if (tiles_list[i].ice && tiles_list[i].temperature >= 240){
-            tiles_list[i].ice = false;
-            tiles_list[i].water = true;
+        if (tileList[i].ice && tileList[i].temperature >= 240){
+            tileList[i].ice = false;
+            tileList[i].water = true;
         }
 
         //Water access
-        if (tiles_list[i].farNeighbors.water || tiles_list[i].neighbors.water) {tiles_list[i].waterAccess = true;}
-        //if (Tile[i].hasWater(1) || Tile[i].hasWater(2){ tiles_list[i].waterAccess = true; }
+        if (tileList[i].farNeighbors.water || tileList[i].neighbors.water) {tileList[i].waterAccess = true;}
+        //if (Tile[i].hasWater(1) || Tile[i].hasWater(2){ tileList[i].waterAccess = true; }
 
         //Oxygen spread (between 2 neighbors, tile with higher O2 concentration gives to tile with lower)
-        for (var j=0; j<tiles_list[i].neighbors.length; j++){
-            if (tiles_list[i].oxygen < tiles_list[i].neighbors[j].oxygen){
-                tiles_list[i].oxygen += (Math.max(tiles_list[i].oxygen, tiles_list[i].neighbors[j].oxygen) - Math.min(tiles_list[i].oxygen, tiles_list[i].neighbors[j].temperature))/3;
-                tiles_list[i].neighbors[j].oxygen -= (Math.max(tiles_list[i].oxygen, tiles_list[i].neighbors[j].oxygen) - Math.min(tiles_list[i].oxygen, tiles_list[i].neighbors[j].temperature))/3;
+        for (var j=0; j<tileList[i].neighbors.length; j++){
+            if (tileList[i].oxygen < tileList[i].neighbors[j].oxygen){
+                tileList[i].oxygen += (Math.max(tileList[i].oxygen, tileList[i].neighbors[j].oxygen) - Math.min(tileList[i].oxygen, tileList[i].neighbors[j].temperature))/3;
+                tileList[i].neighbors[j].oxygen -= (Math.max(tileList[i].oxygen, tileList[i].neighbors[j].oxygen) - Math.min(tileList[i].oxygen, tileList[i].neighbors[j].temperature))/3;
             }
-            else if (tiles_list[i].oxygen > tiles_list[i].neighbors[j].oxygen){
-                tiles_list[i].oxygen -= (Math.max(tiles_list[i].oxygen, tiles_list[i].neighbors[j].oxygen) - Math.min(tiles_list[i].oxygen, tiles_list[i].neighbors[j].temperature))/3;
-                tiles_list[i].neighbors[j].oxygen += (Math.max(tiles_list[i].oxygen, tiles_list[i].neighbors[j].oxygen) - Math.min(tiles_list[i].oxygen, tiles_list[i].neighbors[j].temperature))/3;
+            else if (tileList[i].oxygen > tileList[i].neighbors[j].oxygen){
+                tileList[i].oxygen -= (Math.max(tileList[i].oxygen, tileList[i].neighbors[j].oxygen) - Math.min(tileList[i].oxygen, tileList[i].neighbors[j].temperature))/3;
+                tileList[i].neighbors[j].oxygen += (Math.max(tileList[i].oxygen, tileList[i].neighbors[j].oxygen) - Math.min(tileList[i].oxygen, tileList[i].neighbors[j].temperature))/3;
             }
         }
 
         //Habitability
-        if (tiles_list[i].temperature >= 250 && tiles_list[i].oxygen >= 1 && tiles_list[i].waterAccess && tiles_list[i].fallout < 1) {
-            tiles_list[i].habitable = 0; //Moss habitable
+        if (tileList[i].temperature >= 250 && tileList[i].oxygen >= 1 && tileList[i].waterAccess && tileList[i].fallout < 1) {
+            tileList[i].habitable = 0; //Moss habitable
         }
-        if (tiles_list[i].temperature >= 270 && tiles_list[i].oxygen >= 1.5 && tiles_list[i].waterAccess && tiles_list[i].fallout < 1) {
-            tiles_list[i].habitable = 1; //Advanced plants habitable
+        if (tileList[i].temperature >= 270 && tileList[i].oxygen >= 1.5 && tileList[i].waterAccess && tileList[i].fallout < 1) {
+            tileList[i].habitable = 1; //Advanced plants habitable
         }
-        if (tiles_list[i].temperature >= 285 && tiles_list[i].oxygen >= 120 && tiles_list[i].waterAccess && tiles_list[i].fallout < 1) {
-            tiles_list[i].habitable = 2; //Human habitable
+        if (tileList[i].temperature >= 285 && tileList[i].oxygen >= 120 && tileList[i].waterAccess && tileList[i].fallout < 1) {
+            tileList[i].habitable = 2; //Human habitable
         }
 
         //Life force, increase if tile is habitable, capped at 50, and decreases if tile is inhabitable
-        switch (tiles_list[i].habitable){
+        switch (tileList[i].habitable){
             case 0:{
-                if (tiles_list[i].lifeForce < 50) {tiles_list[i].lifeForce += tiles_list[i].moss * Lives[0].growth;}
-                if (tiles_list[i].lifeForce > 50) {tiles_list[i].lifeForce = 50;}
+                if (tileList[i].lifeForce < 50) {tileList[i].lifeForce += tileList[i].moss * Lives[0].growth;}
+                if (tileList[i].lifeForce > 50) {tileList[i].lifeForce = 50;}
                 break;
             }
             case 1:{
-                if (tiles_list[i].lifeForce < 50) {tiles_list[i].lifeForce += tiles_list[i].moss * Lives[0].growth + tiles_list[i].plants * Lives[1].growth;}
-                if (tiles_list[i].lifeForce > 50) {tiles_list[i].lifeForce = 50;}
+                if (tileList[i].lifeForce < 50) {tileList[i].lifeForce += tileList[i].moss * Lives[0].growth + tileList[i].plants * Lives[1].growth;}
+                if (tileList[i].lifeForce > 50) {tileList[i].lifeForce = 50;}
                 break;
             }
             case 2:{
-                if (tiles_list[i].lifeForce < 50) {tiles_list[i].lifeForce += tiles_list[i].moss * Lives[0].growth + tiles_list[i].plants * Lives[1].growth;}
-                if (tiles_list[i].lifeForce > 50) {tiles_list[i].lifeForce = 50;}
+                if (tileList[i].lifeForce < 50) {tileList[i].lifeForce += tileList[i].moss * Lives[0].growth + tileList[i].plants * Lives[1].growth;}
+                if (tileList[i].lifeForce > 50) {tileList[i].lifeForce = 50;}
                 break;
             }
             default:{
-                tiles_list[i].lifeForce -= 10;
+                tileList[i].lifeForce -= 10;
                 break;
             }
         }
@@ -171,10 +171,10 @@ function perpetualChange(){
 
 
         //Oxygen production by pyrolysis and plants
-        if (tiles_list[i].pyrolyzing){
-            tiles_list[i].oxygen += 0.1;
+        if (tileList[i].pyrolyzing){
+            tileList[i].oxygen += 0.1;
         }
-        tiles_list[i].oxygen += (tiles_list[i].lifeForce/1000);
+        tileList[i].oxygen += (tileList[i].lifeForce/1000);
     }
 
     //Mirror S.S. construction on/off
@@ -234,12 +234,12 @@ function fExplosive(type, target){
     budget += Explosives[type].price;
     dBudget += Explosives[type].dPrice;
 
-    tiles_list[target].temperature += Explosives[type].tmp;
-    tiles_list[target].fallout += 10;
-    for (var i=0; i<tiles_list[target].neighbors.length; i++){
-        tiles_list[target].neighbors[i].fallout += Explosives[type].fallout;
+    tileList[target].temperature += Explosives[type].tmp;
+    tileList[target].fallout += 10;
+    for (var i=0; i<tileList[target].neighbors.length; i++){
+        tileList[target].neighbors[i].fallout += Explosives[type].fallout;
     }
-    tiles_list[target]. altitude += Explosives[type].altitude;
+    tileList[target]. altitude += Explosives[type].altitude;
 }
 
 
@@ -320,7 +320,7 @@ function fMeteor2(target){
     budget += meteor2.price;
     dBudget += meteor2.dPrice;
 
-    tiles_list[target].temperature += 10;
+    tileList[target].temperature += 10;
 
     Items[2].list.pop();
 }
@@ -329,24 +329,24 @@ function fMeteor2(target){
  * Turn pyrolysis of a tile on or off
  */
 function fPyrolysis(target) {
-    if (!tiles_list[target].pyrolyzing){
+    if (!tileList[target].pyrolyzing){
         dBudget += Pyrolysis[0].dPrice;
-        tiles_list[target].pyrolyzing = true;
+        tileList[target].pyrolyzing = true;
     }
     else{
         dBudget -= Pyrolysis[0].dPrice;
-        tiles_list[target].pyrolyzing = false;
+        tileList[target].pyrolyzing = false;
     }
 }
 
 function fLife (type, target){
     switch (type){
         case 0:{
-            tiles_list[target].moss = 1;
+            tileList[target].moss = 1;
             break;
         }
         case 1:{
-            tiles_list[target].plants = 1;
+            tileList[target].plants = 1;
             break;
         }
     }
@@ -362,8 +362,8 @@ function mouseClicked(){
     if (mouseOverExplosive1){explosive1(0);}
     if (mouseOverExplosive2){explosive2(0);}
 
-    for (var i=0; i<tiles_list.length; i++){
-        console.log("Tile: " + i + "\nTemp: " + tiles_list[i].temperature.toFixed(2) + "\nAltitude: " + tiles_list[i].altitude + "\nFallout: " + tiles_list[i].fallout);
+    for (var i=0; i<tileList.length; i++){
+        console.log("Tile: " + i + "\nTemp: " + tileList[i].temperature.toFixed(2) + "\nAltitude: " + tileList[i].altitude + "\nFallout: " + tileList[i].fallout);
     }
 }
 

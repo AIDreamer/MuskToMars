@@ -4,29 +4,40 @@
     <meta charset="utf-8">
     <title>Hexasphere.js</title>
     <!-- these are just for the demo page / options -->
-    <link href="styles.css" rel="stylesheet" type="text/css" />
+    <link href="css/style.css" rel="stylesheet" type="text/css" />
 
 </head>
 <body>
     <!-- Resources -->
     <img id="projection" src="../mars_texture/marsmap1k.jpg" />
     <img id="height_map" src="../mars_texture/marsbump1k.jpg" />
+    <img id="ice_map" src="../mars_texture/icemap1k.jpg" />
+    <img id="flare1" src="../mars_texture/lensflare0.png" />
+    <img id="flare2" src="../mars_texture/lensflare2.png" />
+    <img id="flare3" src="../mars_texture/lensflare3.png" />
 
     <!-- Upload libraries -->
-    <script src="../libraries/three.min.js"></script>
+    <script src="../libraries/three.js"></script>
+    <script src="../libraries/d3.min.js"></script>
     <script src="include/TrackballControls.js"></script>
+    <script src="include/SkyShader.js"></script>
     <script src="src/point.js"></script>
     <script src="src/face.js"></script>
     <script src="src/tile.js"></script>
+    <script src="src/effectsarray.js"></script>
+    <script src="src/explosion.js"></script>
     <script src="src/hexasphere.js"></script>
 
     <!-- Tree resources -->
-    <script src="../assets/treetrunk.js"></script>
-    <script src="../assets/treeleaves.js"></script>
+    <script src="../assets/trunk.js"></script>
+    <script src="../assets/leave.js"></script>
 
     <!-- The main program -->
     <script src="constants.js"></script>
-    <script src="src/tileFunctionsDemo.js"></script>
+    <script src="src/tileFunctions.js"></script>
     <script src="main2.js"></script>
+
+    <div id="menu"></div>
+    <div id="textDiv"></div>
 </body>
 </html>

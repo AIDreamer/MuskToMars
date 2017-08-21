@@ -12,6 +12,10 @@ var Point = function(x,y,z){
     this.faces = [];
 };
 
+Point.prototype.clone = function() {
+    return new Point(this.x, this.y, this.z);
+}
+
 Point.prototype.subdivide = function(point, count, checkPoint){
 
     var segments = [];
@@ -109,8 +113,6 @@ Point.prototype.findCommonFace = function(other, notThisFace){
 
     return null;
 };
-
-
 
 Point.prototype.toString = function(){
     return "" + Math.round(this.x*100)/100 + "," + Math.round(this.y*100)/100 + "," + Math.round(this.z*100)/100;

@@ -1,3 +1,3 @@
 # MuskToMars
 
-This is Musk to Mars project. Bring Musk to Mars before he dies!!!
+This project is a visualization of Mars terrain after being terraformed. To view the project, simply download this project and open the file ```hexasphere/index2.html```
